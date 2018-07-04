@@ -1504,12 +1504,7 @@ scorepointerset
  tax
  rts
 game
-.L00 ;  rem Leyenda
-
-.
- ; 
-
-.L01 ;  playfield:
+.L00 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -1521,11 +1516,11 @@ PF_data0
 	.byte %11111111, %00001111, %00001111, %11111111
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %11100000, %11110000, %00000000
-	.byte %10000000, %11100000, %11110000, %00000000
-	.byte %10000000, %11100000, %11110000, %00000000
-	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %11100000, %11110000, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %11111111, %11111111, %11111111, %11111111
@@ -1537,28 +1532,28 @@ pflabel0
 .
  ; 
 
-.L02 ;  player0:
+.L01 ;  player0:
 
-	LDA #<playerL02_0
+	LDA #<playerL01_0
 
 	STA player0pointerlo
-	LDA #>playerL02_0
+	LDA #>playerL01_0
 
 	STA player0pointerhi
-	LDA #9
+	LDA #10
 	STA player0height
 .
  ; 
 
-.L03 ;  COLUPF  =  176
+.L02 ;  COLUPF  =  176
 
 	LDA #176
 	STA COLUPF
-.L04 ;  scorecolor  =  52
+.L03 ;  scorecolor  =  52
 
 	LDA #52
 	STA scorecolor
-.L05 ;  score  =  0
+.L04 ;  score  =  0
 
 	LDA #$00
 	STA score+2
@@ -1569,41 +1564,53 @@ pflabel0
 .
  ; 
 
-.L06 ;  dim nodown  =  a
-
-.L07 ;  dim noup  =  b
-
-.L08 ;  dim noleft  =  c
-
-.L09 ;  dim noright  =  d
+.
+ ; 
 
 .
  ; 
 
-.L010 ;  nodown  =  0
+.L05 ;  dim nodown  =  a
+
+.L06 ;  dim noup  =  b
+
+.L07 ;  dim noleft  =  c
+
+.L08 ;  dim noright  =  d
+
+.L09 ;  dim room  =  e
+
+.
+ ; 
+
+.L010 ;  room  =  1
+
+	LDA #1
+	STA room
+.L011 ;  nodown  =  0
 
 	LDA #0
 	STA nodown
-.L011 ;  noup  =  0
+.L012 ;  noup  =  0
 
 	LDA #0
 	STA noup
-.L012 ;  noleft  =  0
+.L013 ;  noleft  =  0
 
 	LDA #0
 	STA noleft
-.L013 ;  noright  =  0
+.L014 ;  noright  =  0
 
 	LDA #0
 	STA noright
 .
  ; 
 
-.L014 ;  player0x  =  21
+.L015 ;  player0x  =  21
 
 	LDA #21
 	STA player0x
-.L015 ;  player0y  =  80
+.L016 ;  player0y  =  80
 
 	LDA #80
 	STA player0y
@@ -1613,89 +1620,178 @@ pflabel0
 .mainloop
  ; mainloop
 
+.L017 ;  const screenheight = 84
+
 .
  ; 
 
-.L016 ;  AUDV0  =  0
+.L018 ;  AUDV0  =  0
 
 	LDA #0
 	STA AUDV0
-.L017 ;  COLUP0  =  4
+.L019 ;  COLUP0  =  4
 
 	LDA #4
 	STA COLUP0
-.L018 ;  COLUP1  =  132
-
-	LDA #132
-	STA COLUP1
 .
  ; 
 
-.L019 ;  rem if !collision(playfield,player0) then nodown = 0 : noup = 0 : noleft = 0 : noright = 0
-
-.L020 ;  if joy0left  &&  noleft  =  0 then gosub moverizquierda
+.L020 ;  if joy0left  &&  !joy0right  &&  !joy0up  &&  !joy0down  &&  noleft  =  0 then gosub moverizquierda
 
  lda #$40
  bit SWCHA
 	BNE .skipL020
 .condpart0
-	LDA noleft
-	CMP #0
-     BNE .skip0then
-.condpart1
- jsr .moverizquierda
-
-.skip0then
-.skipL020
-.L021 ;  if joy0right  &&  noright  =  0 then gosub moverderecha
-
  lda #$80
  bit SWCHA
-	BNE .skipL021
-.condpart2
-	LDA noright
-	CMP #0
-     BNE .skip2then
-.condpart3
- jsr .moverderecha
-
-.skip2then
-.skipL021
-.L022 ;  if joy0up  &&  noup  =  0 then gosub moverarriba
-
+	BEQ .skip0then
+.condpart1
  lda #$10
  bit SWCHA
-	BNE .skipL022
-.condpart4
-	LDA noup
-	CMP #0
-     BNE .skip4then
-.condpart5
- jsr .moverarriba
-
-.skip4then
-.skipL022
-.L023 ;  if joy0down  &&  nodown  =  0 then gosub moverabajo
-
+	BEQ .skip1then
+.condpart2
  lda #$20
  bit SWCHA
-	BNE .skipL023
+	BEQ .skip2then
+.condpart3
+	LDA noleft
+	CMP #0
+     BNE .skip3then
+.condpart4
+ jsr .moverizquierda
+
+.skip3then
+.skip2then
+.skip1then
+.skip0then
+.skipL020
+.L021 ;  if !joy0left  &&  joy0right  &&  !joy0up  &&  !joy0down  &&  noright  =  0 then gosub moverderecha
+
+ lda #$40
+ bit SWCHA
+	BEQ .skipL021
+.condpart5
+ lda #$80
+ bit SWCHA
+	BNE .skip5then
 .condpart6
+ lda #$10
+ bit SWCHA
+	BEQ .skip6then
+.condpart7
+ lda #$20
+ bit SWCHA
+	BEQ .skip7then
+.condpart8
+	LDA noright
+	CMP #0
+     BNE .skip8then
+.condpart9
+ jsr .moverderecha
+
+.skip8then
+.skip7then
+.skip6then
+.skip5then
+.skipL021
+.L022 ;  if !joy0left  &&  !joy0right  &&  joy0up  &&  !joy0down  &&  noup  =  0 then gosub moverarriba
+
+ lda #$40
+ bit SWCHA
+	BEQ .skipL022
+.condpart10
+ lda #$80
+ bit SWCHA
+	BEQ .skip10then
+.condpart11
+ lda #$10
+ bit SWCHA
+	BNE .skip11then
+.condpart12
+ lda #$20
+ bit SWCHA
+	BEQ .skip12then
+.condpart13
+	LDA noup
+	CMP #0
+     BNE .skip13then
+.condpart14
+ jsr .moverarriba
+
+.skip13then
+.skip12then
+.skip11then
+.skip10then
+.skipL022
+.L023 ;  if !joy0left  &&  !joy0right  &&  !joy0up  &&  joy0down  &&  nodown  =  0 then gosub moverabajo
+
+ lda #$40
+ bit SWCHA
+	BEQ .skipL023
+.condpart15
+ lda #$80
+ bit SWCHA
+	BEQ .skip15then
+.condpart16
+ lda #$10
+ bit SWCHA
+	BEQ .skip16then
+.condpart17
+ lda #$20
+ bit SWCHA
+	BNE .skip17then
+.condpart18
 	LDA nodown
 	CMP #0
-     BNE .skip6then
-.condpart7
+     BNE .skip18then
+.condpart19
  jsr .moverabajo
 
-.skip6then
+.skip18then
+.skip17then
+.skip16then
+.skip15then
 .skipL023
 .
  ; 
 
-.L024 ;  drawscreen
+.L024 ;  if room  =  1  &&  player0x  >  145 then gosub room2  :  player0x  =  22
+
+	LDA room
+	CMP #1
+     BNE .skipL024
+.condpart20
+	LDA #145
+	CMP player0x
+     BCS .skip20then
+.condpart21
+ jsr .room2
+	LDA #22
+	STA player0x
+.skip20then
+.skipL024
+.L025 ;  if room  =  2  &&  player0x  <  10 then gosub room1  :  player0x  =  140
+
+	LDA room
+	CMP #2
+     BNE .skipL025
+.condpart22
+	LDA player0x
+	CMP #10
+     BCS .skip22then
+.condpart23
+ jsr .room1
+	LDA #140
+	STA player0x
+.skip22then
+.skipL025
+.
+ ; 
+
+.L026 ;  drawscreen
 
  jsr drawscreen
-.L025 ;  goto mainloop
+.L027 ;  goto mainloop
 
  jmp .mainloop
 
@@ -1705,39 +1801,42 @@ pflabel0
 .moverizquierda
  ; moverizquierda
 
-.L026 ;  player0:
+.L028 ;  player0:
 
-	LDA #<playerL026_0
+	LDA #<playerL028_0
 
 	STA player0pointerlo
-	LDA #>playerL026_0
+	LDA #>playerL028_0
 
 	STA player0pointerhi
-	LDA #8
+	LDA #9
 	STA player0height
-.L027 ;  player0x  =  player0x  -  1
+.
+ ; 
 
-	DEC player0x
-.L028 ;  if collision(playfield,player0) then noleft  =  1  :  noright  =  0  :  player0x  =  player0x  +  2 else noleft  =  0  :  noright  =  0
+.L029 ;  if collision(playfield,player0) then player0x  =  player0x  +  1  :  noright  =  0  :  noleft  =  1  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL028
-.condpart8
+	BPL .skipL029
+.condpart24
+	INC player0x
+	LDA #0
+	STA noright
 	LDA #1
 	STA noleft
 	LDA #0
-	STA noright
-	LDA player0x
-	CLC
-	ADC #2
-	STA player0x
+	STA noup
+	STA nodown
  jmp .skipelse0
-.skipL028
+.skipL029
+	DEC player0x
 	LDA #0
-	STA noleft
 	STA noright
+	STA noleft
+	STA noup
+	STA nodown
 .skipelse0
-.L029 ;  return
+.L030 ;  return
 
 	RTS
 .
@@ -1746,37 +1845,39 @@ pflabel0
 .moverderecha
  ; moverderecha
 
-.L030 ;  player0:
+.L031 ;  player0:
 
-	LDA #<playerL030_0
+	LDA #<playerL031_0
 
 	STA player0pointerlo
-	LDA #>playerL030_0
+	LDA #>playerL031_0
 
 	STA player0pointerhi
-	LDA #8
+	LDA #9
 	STA player0height
-.L031 ;  player0x  =  player0x  +  1
+.
+ ; 
 
-	INC player0x
-.L032 ;  if collision(playfield,player0) then noleft  =  0  :  noright  =  1  :  player0x  =  player0x  -  2 else noleft  =  0  :  noright  =  0
+.L032 ;  if collision(playfield,player0) then player0x  =  player0x  -  1  :  noright  =  1  :  noleft  =  0  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
 	BPL .skipL032
-.condpart9
-	LDA #0
-	STA noleft
+.condpart25
+	DEC player0x
 	LDA #1
 	STA noright
-	LDA player0x
-	SEC
-	SBC #2
-	STA player0x
- jmp .skipelse1
-.skipL032
 	LDA #0
 	STA noleft
+	STA noup
+	STA nodown
+ jmp .skipelse1
+.skipL032
+	INC player0x
+	LDA #0
 	STA noright
+	STA noleft
+	STA noup
+	STA nodown
 .skipelse1
 .L033 ;  return
 
@@ -1795,31 +1896,34 @@ pflabel0
 	LDA #>playerL034_0
 
 	STA player0pointerhi
-	LDA #8
+	LDA #9
 	STA player0height
-.L035 ;  player0y  =  player0y  -  1
+.
+ ; 
 
-	DEC player0y
-.L036 ;  if collision(playfield,player0) then nodown  =  0  :  noup  =  1  :  player0y  =  player0y  +  2 else nodown  =  0  :  noup  =  0
+.L035 ;  if collision(playfield,player0) then player0y  =  player0y  +  1  :  noright  =  0  :  noleft  =  0  :  noup  =  1  :  nodown  =  0 else player0y  =  player0y  -  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL036
-.condpart10
+	BPL .skipL035
+.condpart26
+	INC player0y
 	LDA #0
-	STA nodown
+	STA noright
+	STA noleft
 	LDA #1
 	STA noup
-	LDA player0y
-	CLC
-	ADC #2
-	STA player0y
- jmp .skipelse2
-.skipL036
 	LDA #0
 	STA nodown
+ jmp .skipelse2
+.skipL035
+	DEC player0y
+	LDA #0
+	STA noright
+	STA noleft
 	STA noup
+	STA nodown
 .skipelse2
-.L037 ;  return
+.L036 ;  return
 
 	RTS
 .
@@ -1828,55 +1932,235 @@ pflabel0
 .moverabajo
  ; moverabajo
 
-.L038 ;  player0:
+.L037 ;  player0:
 
-	LDA #<playerL038_0
+	LDA #<playerL037_0
 
 	STA player0pointerlo
-	LDA #>playerL038_0
+	LDA #>playerL037_0
 
 	STA player0pointerhi
-	LDA #8
+	LDA #9
 	STA player0height
-.L039 ;  player0y  =  player0y  +  1
+.
+ ; 
 
-	INC player0y
-.L040 ;  if collision(playfield,player0) then nodown  =  1  :  noup  =  0  :  player0y  =  player0y  -  2 else nodown  =  0  :  noup  =  0
+.L038 ;  if collision(playfield,player0) then player0y  =  player0y  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  1 else player0y  =  player0y  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL040
-.condpart11
+	BPL .skipL038
+.condpart27
+	DEC player0y
+	LDA #0
+	STA noright
+	STA noleft
+	STA noup
 	LDA #1
 	STA nodown
-	LDA #0
-	STA noup
-	LDA player0y
-	SEC
-	SBC #2
-	STA player0y
  jmp .skipelse3
-.skipL040
+.skipL038
+	INC player0y
 	LDA #0
-	STA nodown
+	STA noright
+	STA noleft
 	STA noup
+	STA nodown
 .skipelse3
-.L041 ;  return
+.L039 ;  return
 
 	RTS
 .
  ; 
 
+.room1
+ ; room1
+
+.L040 ;  room  =  1
+
+	LDA #1
+	STA room
+.L041 ;  pfclear
+
+	LDA #0
+ jsr pfclear
+.L042 ;  playfield:
+
+  ifconst pfres
+    ldx #4*pfres-1
+  else
+	  ldx #47
+  endif
+	jmp pflabel1
+PF_data1
+	.byte %11111111, %00001111, %00001111, %11111111
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %00000000, %00010000, %00000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %11111111, %11111111, %11111111, %11111111
+pflabel1
+	lda PF_data1,x
+	sta playfield,x
+	dex
+	bpl pflabel1
+.L043 ;  drawscreen
+
+ jsr drawscreen
+.L044 ;  return
+
+	RTS
 .
  ; 
 
- if (<*) > (<(*+10))
+.room2
+ ; room2
+
+.L045 ;  room  =  2
+
+	LDA #2
+	STA room
+.L046 ;  pfclear
+
+	LDA #0
+ jsr pfclear
+.L047 ;  playfield:
+
+  ifconst pfres
+    ldx #4*pfres-1
+  else
+	  ldx #47
+  endif
+	jmp pflabel2
+PF_data2
+	.byte %11111111, %00001111, %00001111, %11111111
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %00000000, %00100000, %00000000, %10000000
+	.byte %00000000, %00100000, %00000000, %10000000
+	.byte %00000000, %00100000, %00000000, %10000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %11111111, %11111111, %11111111, %11111111
+pflabel2
+	lda PF_data2,x
+	sta playfield,x
+	dex
+	bpl pflabel2
+.L048 ;  drawscreen
+
+ jsr drawscreen
+.L049 ;  return
+
+	RTS
+.
+ ; 
+
+.room3
+ ; room3
+
+.L050 ;  room  =  3
+
+	LDA #3
+	STA room
+.L051 ;  pfclear
+
+	LDA #0
+ jsr pfclear
+.L052 ;  playfield:
+
+  ifconst pfres
+    ldx #4*pfres-1
+  else
+	  ldx #47
+  endif
+	jmp pflabel3
+PF_data3
+	.byte %11111111, %11111111, %11111111, %11111100
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00000000, %00000000
+	.byte %10000000, %00000000, %00000000, %00000000
+	.byte %10000000, %00000000, %00000000, %00000000
+	.byte %10000000, %11100000, %11110000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %11111111, %00011111, %00001111, %11111111
+pflabel3
+	lda PF_data3,x
+	sta playfield,x
+	dex
+	bpl pflabel3
+.L053 ;  drawscreen
+
+ jsr drawscreen
+.L054 ;  return
+
+	RTS
+.
+ ; 
+
+.room4
+ ; room4
+
+.L055 ;  room  =  4
+
+	LDA #4
+	STA room
+.L056 ;  pfclear
+
+	LDA #0
+ jsr pfclear
+.L057 ;  playfield:
+
+  ifconst pfres
+    ldx #4*pfres-1
+  else
+	  ldx #47
+  endif
+	jmp pflabel4
+PF_data4
+	.byte %11111111, %11111111, %11111111, %11111111
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00100000, %00010000, %10000000
+	.byte %00000000, %00100000, %00010000, %10000000
+	.byte %00000000, %00100000, %00010000, %10000000
+	.byte %00000000, %00100000, %00010000, %10000000
+	.byte %10000000, %00100000, %00010000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %11111111, %00001111, %00001111, %11111111
+pflabel4
+	lda PF_data4,x
+	sta playfield,x
+	dex
+	bpl pflabel4
+.L058 ;  drawscreen
+
+ jsr drawscreen
+.L059 ;  return
+
+	RTS
+.
+ ; 
+
+ if (<*) > (<(*+11))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playerL02_0
+playerL01_0
 
 	.byte 0
+	.byte  %00100100
 	.byte  %00100100
 	.byte  %00100100
 	.byte  %10011001
@@ -1886,14 +2170,15 @@ playerL02_0
 	.byte  %10111100
 	.byte  %10110110
 	.byte 
- if (<*) > (<(*+9))
+ if (<*) > (<(*+10))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playerL026_0
+playerL028_0
 
 	.byte 0
+	.byte  %00100100
 	.byte  %00100100
 	.byte  %00100100
 	.byte  %10011001
@@ -1902,14 +2187,15 @@ playerL026_0
 	.byte  %10100100
 	.byte  %10111100
 	.byte  %10110110
- if (<*) > (<(*+9))
+ if (<*) > (<(*+10))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playerL030_0
+playerL031_0
 
 	.byte 0
+	.byte  %00100100
 	.byte  %00100100
 	.byte  %00100100
 	.byte  %10011001
@@ -1918,7 +2204,7 @@ playerL030_0
 	.byte  %00100101
 	.byte  %00111101
 	.byte  %01101101
- if (<*) > (<(*+9))
+ if (<*) > (<(*+10))
 	repeat ($100-<*)
 	.byte 0
 	repend
@@ -1928,20 +2214,22 @@ playerL034_0
 	.byte 0
 	.byte  %00100100
 	.byte  %00100100
+	.byte  %00100100
 	.byte  %10011001
 	.byte  %11111111
 	.byte  %10011001
 	.byte  %00100101
 	.byte  %00111101
 	.byte  %00100101
- if (<*) > (<(*+9))
+ if (<*) > (<(*+10))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playerL038_0
+playerL037_0
 
 	.byte 0
+	.byte  %00100100
 	.byte  %00100101
 	.byte  %00100101
 	.byte  %10011001
