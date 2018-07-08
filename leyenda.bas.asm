@@ -1504,30 +1504,17 @@ scorepointerset
  tax
  rts
 game
-.L00 ;  player0:
+.L00 ;  player1:
 
-	LDA #<playerL00_0
-
-	STA player0pointerlo
-	LDA #>playerL00_0
-
-	STA player0pointerhi
-	LDA #9
-	STA player0height
-.
- ; 
-
-.L01 ;  player1:
-
-	LDA #<playerL01_1
+	LDA #<playerL00_1
 
 	STA player1pointerlo
-	LDA #>playerL01_1
+	LDA #>playerL00_1
 
 	STA player1pointerhi
 	LDA #4
 	STA player1height
-.L02 ;  score  =  0
+.L01 ;  score  =  0
 
 	LDA #$00
 	STA score+2
@@ -1538,126 +1525,134 @@ game
 .
  ; 
 
-.L03 ;  COLUBK  =  $04
+.L02 ;  COLUBK  =  $04
 
 	LDA #$04
 	STA COLUBK
-.L04 ;  COLUPF  =  $C0
+.L03 ;  COLUPF  =  $C0
 
 	LDA #$C0
 	STA COLUPF
 .
  ; 
 
-.L05 ;  dim nodown  =  a
+.L04 ;  dim nodown  =  a
 
-.L06 ;  dim noup  =  b
+.L05 ;  dim noup  =  b
 
-.L07 ;  dim noleft  =  c
+.L06 ;  dim noleft  =  c
 
-.L08 ;  dim noright  =  d
+.L07 ;  dim noright  =  d
 
-.L09 ;  dim room  =  e
+.L08 ;  dim room  =  e
 
-.L010 ;  dim haslance  =  f
+.L09 ;  dim haslance  =  f
 
-.L011 ;  dim hasshield  =  g
+.L010 ;  dim hasshield  =  g
 
-.L012 ;  dim hascoin  =  h
+.L011 ;  dim hascoin  =  h
 
-.L013 ;  dim randnumber  =  i
+.L012 ;  dim randnumber  =  i
+
+.L013 ;  dim coinvalue  =  j
+
+.L014 ;  dim compass  =  k
 
 .
  ; 
 
-.L014 ;  haslance  =  0
+.L015 ;  haslance  =  0
 
 	LDA #0
 	STA haslance
-.L015 ;  hasshield  =  0
+.L016 ;  hasshield  =  0
 
 	LDA #0
 	STA hasshield
-.L016 ;  hascoin  =  0
+.L017 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
+.L018 ;  coinvalue  =  1
+
+	LDA #1
+	STA coinvalue
 .
  ; 
 
-.L017 ;  room  =  0
+.L019 ;  room  =  0
 
 	LDA #0
 	STA room
-.L018 ;  nodown  =  0
+.L020 ;  nodown  =  0
 
 	LDA #0
 	STA nodown
-.L019 ;  noup  =  0
+.L021 ;  noup  =  0
 
 	LDA #0
 	STA noup
-.L020 ;  noleft  =  0
+.L022 ;  noleft  =  0
 
 	LDA #0
 	STA noleft
-.L021 ;  noright  =  0
+.L023 ;  noright  =  0
 
 	LDA #0
 	STA noright
 .
  ; 
 
-.L022 ;  player0x  =  21
+.L024 ;  player0x  =  21
 
 	LDA #21
 	STA player0x
-.L023 ;  player0y  =  80
+.L025 ;  player0y  =  80
 
 	LDA #80
 	STA player0y
 .
  ; 
 
-.L024 ;  missile0height  =  8
+.L026 ;  missile0height  =  8
 
 	LDA #8
 	STA missile0height
-.L025 ;  missile0x  =  83
+.L027 ;  missile0x  =  83
 
 	LDA #83
 	STA missile0x
-.L026 ;  missile0y  =  48
+.L028 ;  missile0y  =  48
 
 	LDA #48
 	STA missile0y
 .
  ; 
 
-.L027 ;  player1x  =  120
+.L029 ;  player1x  =  120
 
 	LDA #120
 	STA player1x
-.L028 ;  player1y  =  20
+.L030 ;  player1y  =  20
 
 	LDA #20
 	STA player1y
 .
  ; 
 
-.L029 ;  ballheight  =  4
+.L031 ;  ballheight  =  4
 
 	LDA #4
 	STA ballheight
-.L030 ;  CTRLPF  =  $21
+.L032 ;  CTRLPF  =  $21
 
 	LDA #$21
 	STA CTRLPF
-.L031 ;  ballx  =  0
+.L033 ;  ballx  =  0
 
 	LDA #0
 	STA ballx
-.L032 ;  bally  =  0
+.L034 ;  bally  =  0
 
 	LDA #0
 	STA bally
@@ -1670,582 +1665,763 @@ game
 .
  ; 
 
-.L033 ;  if room  =  0 then gosub room1
+.L035 ;  if room  =  0 then gosub room1  :  gosub moverderecha
 
 	LDA room
 	CMP #0
-     BNE .skipL033
+     BNE .skipL035
 .condpart0
  jsr .room1
+ jsr .moverderecha
 
-.skipL033
-.L034 ;  const screenheight = 84
+.skipL035
+.L036 ;  const screenheight = 84
 
 .
  ; 
 
-.L035 ;  COLUP0  =  $86
+.L037 ;  COLUP0  =  $86
 
 	LDA #$86
 	STA COLUP0
-.L036 ;  COLUP1  =  $1C
+.L038 ;  COLUP1  =  $4A
 
-	LDA #$1C
+	LDA #$4A
 	STA COLUP1
+.L039 ;  if coinvalue  =  5 then COLUP1  =  $0A
+
+	LDA coinvalue
+	CMP #5
+     BNE .skipL039
+.condpart1
+	LDA #$0A
+	STA COLUP1
+.skipL039
+.L040 ;  if coinvalue  =  32 then COLUP1  =  $1E
+
+	LDA coinvalue
+	CMP #32
+     BNE .skipL040
+.condpart2
+	LDA #$1E
+	STA COLUP1
+.skipL040
 .
  ; 
 
-.L037 ;  AUDV0  =  0
+.L041 ;  AUDV0  =  0
 
 	LDA #0
 	STA AUDV0
 .
  ; 
 
-.L038 ;  if joy0left  &&  !joy0right  &&  !joy0up  &&  !joy0down  &&  noleft  =  0 then gosub moverizquierda
+.L042 ;  if joy0left  &&  !joy0right  &&  !joy0up  &&  !joy0down  &&  noleft  =  0 then gosub moverizquierda
 
  lda #$40
  bit SWCHA
-	BNE .skipL038
-.condpart1
- lda #$80
- bit SWCHA
-	BEQ .skip1then
-.condpart2
- lda #$10
- bit SWCHA
-	BEQ .skip2then
+	BNE .skipL042
 .condpart3
- lda #$20
+ lda #$80
  bit SWCHA
 	BEQ .skip3then
 .condpart4
+ lda #$10
+ bit SWCHA
+	BEQ .skip4then
+.condpart5
+ lda #$20
+ bit SWCHA
+	BEQ .skip5then
+.condpart6
 	LDA noleft
 	CMP #0
-     BNE .skip4then
-.condpart5
+     BNE .skip6then
+.condpart7
  jsr .moverizquierda
 
+.skip6then
+.skip5then
 .skip4then
 .skip3then
-.skip2then
-.skip1then
-.skipL038
-.L039 ;  if !joy0left  &&  joy0right  &&  !joy0up  &&  !joy0down  &&  noright  =  0 then gosub moverderecha
+.skipL042
+.L043 ;  if !joy0left  &&  joy0right  &&  !joy0up  &&  !joy0down  &&  noright  =  0 then gosub moverderecha
 
  lda #$40
  bit SWCHA
-	BEQ .skipL039
-.condpart6
+	BEQ .skipL043
+.condpart8
  lda #$80
  bit SWCHA
-	BNE .skip6then
-.condpart7
+	BNE .skip8then
+.condpart9
  lda #$10
  bit SWCHA
-	BEQ .skip7then
-.condpart8
+	BEQ .skip9then
+.condpart10
  lda #$20
  bit SWCHA
-	BEQ .skip8then
-.condpart9
+	BEQ .skip10then
+.condpart11
 	LDA noright
 	CMP #0
-     BNE .skip9then
-.condpart10
+     BNE .skip11then
+.condpart12
  jsr .moverderecha
 
+.skip11then
+.skip10then
 .skip9then
 .skip8then
-.skip7then
-.skip6then
-.skipL039
-.L040 ;  if !joy0left  &&  !joy0right  &&  joy0up  &&  !joy0down  &&  noup  =  0 then gosub moverarriba
+.skipL043
+.L044 ;  if !joy0left  &&  !joy0right  &&  joy0up  &&  !joy0down  &&  noup  =  0 then gosub moverarriba
 
  lda #$40
  bit SWCHA
-	BEQ .skipL040
-.condpart11
- lda #$80
- bit SWCHA
-	BEQ .skip11then
-.condpart12
- lda #$10
- bit SWCHA
-	BNE .skip12then
+	BEQ .skipL044
 .condpart13
- lda #$20
+ lda #$80
  bit SWCHA
 	BEQ .skip13then
 .condpart14
+ lda #$10
+ bit SWCHA
+	BNE .skip14then
+.condpart15
+ lda #$20
+ bit SWCHA
+	BEQ .skip15then
+.condpart16
 	LDA noup
 	CMP #0
-     BNE .skip14then
-.condpart15
+     BNE .skip16then
+.condpart17
  jsr .moverarriba
 
+.skip16then
+.skip15then
 .skip14then
 .skip13then
-.skip12then
-.skip11then
-.skipL040
-.L041 ;  if !joy0left  &&  !joy0right  &&  !joy0up  &&  joy0down  &&  nodown  =  0 then gosub moverabajo
+.skipL044
+.L045 ;  if !joy0left  &&  !joy0right  &&  !joy0up  &&  joy0down  &&  nodown  =  0 then gosub moverabajo
 
  lda #$40
  bit SWCHA
-	BEQ .skipL041
-.condpart16
+	BEQ .skipL045
+.condpart18
  lda #$80
  bit SWCHA
-	BEQ .skip16then
-.condpart17
+	BEQ .skip18then
+.condpart19
  lda #$10
  bit SWCHA
-	BEQ .skip17then
-.condpart18
+	BEQ .skip19then
+.condpart20
  lda #$20
  bit SWCHA
-	BNE .skip18then
-.condpart19
-	LDA nodown
-	CMP #0
-     BNE .skip19then
-.condpart20
- jsr .moverabajo
-
-.skip19then
-.skip18then
-.skip17then
-.skip16then
-.skipL041
-.
- ; 
-
-.L042 ;  if collision(missile0,player0)  &&  haslance  =  0 then haslance  =  1
-
-	BIT CXM0P
-	BVC .skipL042
+	BNE .skip20then
 .condpart21
-	LDA haslance
+	LDA nodown
 	CMP #0
      BNE .skip21then
 .condpart22
+ jsr .moverabajo
+
+.skip21then
+.skip20then
+.skip19then
+.skip18then
+.skipL045
+.
+ ; 
+
+.L046 ;  if joy0fire  &&  joy0left  &&  !joy0right  &&  !joy0up  &&  !joy0down  &&  haslance  =  1 then haslance  =  2  :  compass  =  4
+
+ lda #$80
+ bit INPT4
+	BNE .skipL046
+.condpart23
+ lda #$40
+ bit SWCHA
+	BNE .skip23then
+.condpart24
+ lda #$80
+ bit SWCHA
+	BEQ .skip24then
+.condpart25
+ lda #$10
+ bit SWCHA
+	BEQ .skip25then
+.condpart26
+ lda #$20
+ bit SWCHA
+	BEQ .skip26then
+.condpart27
+	LDA haslance
+	CMP #1
+     BNE .skip27then
+.condpart28
+	LDA #2
+	STA haslance
+	LDA #4
+	STA compass
+.skip27then
+.skip26then
+.skip25then
+.skip24then
+.skip23then
+.skipL046
+.L047 ;  if joy0fire  &&  !joy0left  &&  joy0right  &&  !joy0up  &&  !joy0down  &&  haslance  =  1 then haslance  =  2  :  compass  =  2
+
+ lda #$80
+ bit INPT4
+	BNE .skipL047
+.condpart29
+ lda #$40
+ bit SWCHA
+	BEQ .skip29then
+.condpart30
+ lda #$80
+ bit SWCHA
+	BNE .skip30then
+.condpart31
+ lda #$10
+ bit SWCHA
+	BEQ .skip31then
+.condpart32
+ lda #$20
+ bit SWCHA
+	BEQ .skip32then
+.condpart33
+	LDA haslance
+	CMP #1
+     BNE .skip33then
+.condpart34
+	LDA #2
+	STA haslance
+	STA compass
+.skip33then
+.skip32then
+.skip31then
+.skip30then
+.skip29then
+.skipL047
+.L048 ;  if joy0fire  &&  !joy0left  &&  !joy0right  &&  joy0up  &&  !joy0down  &&  haslance  =  1 then haslance  =  2  :  compass  =  1
+
+ lda #$80
+ bit INPT4
+	BNE .skipL048
+.condpart35
+ lda #$40
+ bit SWCHA
+	BEQ .skip35then
+.condpart36
+ lda #$80
+ bit SWCHA
+	BEQ .skip36then
+.condpart37
+ lda #$10
+ bit SWCHA
+	BNE .skip37then
+.condpart38
+ lda #$20
+ bit SWCHA
+	BEQ .skip38then
+.condpart39
+	LDA haslance
+	CMP #1
+     BNE .skip39then
+.condpart40
+	LDA #2
+	STA haslance
+	LDA #1
+	STA compass
+.skip39then
+.skip38then
+.skip37then
+.skip36then
+.skip35then
+.skipL048
+.L049 ;  if joy0fire  &&  !joy0left  &&  !joy0right  &&  !joy0up  &&  joy0down  &&  haslance  =  1 then haslance  =  2  :  compass  =  3
+
+ lda #$80
+ bit INPT4
+	BNE .skipL049
+.condpart41
+ lda #$40
+ bit SWCHA
+	BEQ .skip41then
+.condpart42
+ lda #$80
+ bit SWCHA
+	BEQ .skip42then
+.condpart43
+ lda #$10
+ bit SWCHA
+	BEQ .skip43then
+.condpart44
+ lda #$20
+ bit SWCHA
+	BNE .skip44then
+.condpart45
+	LDA haslance
+	CMP #1
+     BNE .skip45then
+.condpart46
+	LDA #2
+	STA haslance
+	LDA #3
+	STA compass
+.skip45then
+.skip44then
+.skip43then
+.skip42then
+.skip41then
+.skipL049
+.
+ ; 
+
+.L050 ;  if haslance  =  2  &&  !collision(playfield,player1) then gosub moverlanza
+
+	LDA haslance
+	CMP #2
+     BNE .skipL050
+.condpart47
+	BIT CXP1FB
+	BMI .skip47then
+.condpart48
+ jsr .moverlanza
+
+.skip47then
+.skipL050
+.
+ ; 
+
+.L051 ;  if collision(missile0,player0)  &&  haslance  =  0 then haslance  =  1
+
+	BIT CXM0P
+	BVC .skipL051
+.condpart49
+	LDA haslance
+	CMP #0
+     BNE .skip49then
+.condpart50
 	LDA #1
 	STA haslance
-.skip21then
-.skipL042
-.L043 ;  if collision(ball,player0)  &&  hasshield  =  0 then hasshield  =  1
+.skip49then
+.skipL051
+.L052 ;  if collision(ball,player0)  &&  hasshield  =  0 then hasshield  =  1
 
 	BIT CXP0FB
-	BVC .skipL043
-.condpart23
+	BVC .skipL052
+.condpart51
 	LDA hasshield
 	CMP #0
-     BNE .skip23then
-.condpart24
+     BNE .skip51then
+.condpart52
 	LDA #1
 	STA hasshield
-.skip23then
-.skipL043
-.L044 ;  if collision(player1,player0)  &&  hascoin  =  0 then hascoin  =  1  :  score  =  score  +  10  :  gosub colocarmoneda
+.skip51then
+.skipL052
+.L053 ;  if collision(player1,player0)  &&  hascoin  =  0 then hascoin  =  1  :  score  =  score  +  coinvalue  :  gosub colocarmoneda
 
 	BIT CXPPMM
-	BPL .skipL044
-.condpart25
+	BPL .skipL053
+.condpart53
 	LDA hascoin
 	CMP #0
-     BNE .skip25then
-.condpart26
+     BNE .skip53then
+.condpart54
 	LDA #1
 	STA hascoin
 	SED
 	CLC
 	LDA score+2
-	ADC #$10
+	ADC coinvalue
 	STA score+2
 	LDA score+1
-	ADC #$00
+	ADC #0
 	STA score+1
 	LDA score
-	ADC #$00
+	ADC #0
 	STA score
 	CLD
  jsr .colocarmoneda
 
-.skip25then
-.skipL044
+.skip53then
+.skipL053
 .
  ; 
 
-.L045 ;  if room  =  1  &&  haslance  =  0 then missile0x  =  83  :  missile0y  =  48
+.L054 ;  if room  =  1  &&  haslance  =  0 then missile0x  =  83  :  missile0y  =  48
 
 	LDA room
 	CMP #1
-     BNE .skipL045
-.condpart27
+     BNE .skipL054
+.condpart55
 	LDA haslance
 	CMP #0
-     BNE .skip27then
-.condpart28
+     BNE .skip55then
+.condpart56
 	LDA #83
 	STA missile0x
 	LDA #48
 	STA missile0y
-.skip27then
-.skipL045
-.L046 ;  if room  <>  1  &&  haslance  =  0 then missile0x  =  0  :  missile0y  =  0
+.skip55then
+.skipL054
+.L055 ;  if room  <>  1  &&  haslance  =  0 then missile0x  =  0  :  missile0y  =  0
 
 	LDA room
 	CMP #1
-     BEQ .skipL046
-.condpart29
+     BEQ .skipL055
+.condpart57
 	LDA haslance
 	CMP #0
-     BNE .skip29then
-.condpart30
+     BNE .skip57then
+.condpart58
 	LDA #0
 	STA missile0x
 	STA missile0y
-.skip29then
-.skipL046
+.skip57then
+.skipL055
 .
  ; 
 
-.L047 ;  if room  =  2  &&  hasshield  =  0 then ballx  =  83  :  bally  =  45
+.L056 ;  if room  =  2  &&  hasshield  =  0 then ballx  =  83  :  bally  =  45
 
 	LDA room
 	CMP #2
-     BNE .skipL047
-.condpart31
+     BNE .skipL056
+.condpart59
 	LDA hasshield
 	CMP #0
-     BNE .skip31then
-.condpart32
+     BNE .skip59then
+.condpart60
 	LDA #83
 	STA ballx
 	LDA #45
 	STA bally
-.skip31then
-.skipL047
-.L048 ;  if room  <>  2  &&  hasshield  =  0 then ballx  =  0  :  bally  =  0
+.skip59then
+.skipL056
+.L057 ;  if room  <>  2  &&  hasshield  =  0 then ballx  =  0  :  bally  =  0
 
 	LDA room
 	CMP #2
-     BEQ .skipL048
-.condpart33
+     BEQ .skipL057
+.condpart61
 	LDA hasshield
 	CMP #0
-     BNE .skip33then
-.condpart34
+     BNE .skip61then
+.condpart62
 	LDA #0
 	STA ballx
 	STA bally
-.skip33then
-.skipL048
-.
- ; 
-
-.L049 ;  if room  =  1  &&  player0x  >  145 then gosub room2  :  player0x  =  22
-
-	LDA room
-	CMP #1
-     BNE .skipL049
-.condpart35
-	LDA #145
-	CMP player0x
-     BCS .skip35then
-.condpart36
- jsr .room2
-	LDA #22
-	STA player0x
-.skip35then
-.skipL049
-.L050 ;  if room  =  2  &&  player0x  <  5 then gosub room1  :  player0x  =  140
-
-	LDA room
-	CMP #2
-     BNE .skipL050
-.condpart37
-	LDA player0x
-	CMP #5
-     BCS .skip37then
-.condpart38
- jsr .room1
-	LDA #140
-	STA player0x
-.skip37then
-.skipL050
-.
- ; 
-
-.L051 ;  if room  =  1  &&  player0y  <  10 then gosub room3  :  player0y  =  80
-
-	LDA room
-	CMP #1
-     BNE .skipL051
-.condpart39
-	LDA player0y
-	CMP #10
-     BCS .skip39then
-.condpart40
- jsr .room3
-	LDA #80
-	STA player0y
-.skip39then
-.skipL051
-.L052 ;  if room  =  3  &&  player0y  >  85 then gosub room1  :  player0y  =  10
-
-	LDA room
-	CMP #3
-     BNE .skipL052
-.condpart41
-	LDA #85
-	CMP player0y
-     BCS .skip41then
-.condpart42
- jsr .room1
-	LDA #10
-	STA player0y
-.skip41then
-.skipL052
-.
- ; 
-
-.L053 ;  if room  =  3  &&  player0x  >  145 then gosub room4  :  player0x  =  22
-
-	LDA room
-	CMP #3
-     BNE .skipL053
-.condpart43
-	LDA #145
-	CMP player0x
-     BCS .skip43then
-.condpart44
- jsr .room4
-	LDA #22
-	STA player0x
-.skip43then
-.skipL053
-.L054 ;  if room  =  4  &&  player0x  <  5 then gosub room3  :  player0x  =  140
-
-	LDA room
-	CMP #4
-     BNE .skipL054
-.condpart45
-	LDA player0x
-	CMP #5
-     BCS .skip45then
-.condpart46
- jsr .room3
-	LDA #140
-	STA player0x
-.skip45then
-.skipL054
-.
- ; 
-
-.L055 ;  if room  =  2  &&  player0y  <  5 then gosub room4  :  player0y  =  80
-
-	LDA room
-	CMP #2
-     BNE .skipL055
-.condpart47
-	LDA player0y
-	CMP #5
-     BCS .skip47then
-.condpart48
- jsr .room4
-	LDA #80
-	STA player0y
-.skip47then
-.skipL055
-.L056 ;  if room  =  4  &&  player0y  >  85 then gosub room2  :  player0y  =  10
-
-	LDA room
-	CMP #4
-     BNE .skipL056
-.condpart49
-	LDA #85
-	CMP player0y
-     BCS .skip49then
-.condpart50
- jsr .room2
-	LDA #10
-	STA player0y
-.skip49then
-.skipL056
-.
- ; 
-
-.L057 ;  if room  =  3  &&  player0y  <  10 then gosub room5  :  player0y  =  80
-
-	LDA room
-	CMP #3
-     BNE .skipL057
-.condpart51
-	LDA player0y
-	CMP #10
-     BCS .skip51then
-.condpart52
- jsr .room5
-	LDA #80
-	STA player0y
-.skip51then
-.skipL057
-.L058 ;  if room  =  5  &&  player0y  >  85 then gosub room3  :  player0y  =  10
-
-	LDA room
-	CMP #5
-     BNE .skipL058
-.condpart53
-	LDA #85
-	CMP player0y
-     BCS .skip53then
-.condpart54
- jsr .room3
-	LDA #10
-	STA player0y
-.skip53then
-.skipL058
-.
- ; 
-
-.L059 ;  if room  =  4  &&  player0x  >  145 then gosub room6  :  player0x  =  22
-
-	LDA room
-	CMP #4
-     BNE .skipL059
-.condpart55
-	LDA #145
-	CMP player0x
-     BCS .skip55then
-.condpart56
- jsr .room6
-	LDA #22
-	STA player0x
-.skip55then
-.skipL059
-.L060 ;  if room  =  6  &&  player0x  <  5 then gosub room4  :  player0x  =  140
-
-	LDA room
-	CMP #6
-     BNE .skipL060
-.condpart57
-	LDA player0x
-	CMP #5
-     BCS .skip57then
-.condpart58
- jsr .room4
-	LDA #140
-	STA player0x
-.skip57then
-.skipL060
-.
- ; 
-
-.L061 ;  if room  =  6  &&  player0x  >  145 then gosub room7  :  player0x  =  22
-
-	LDA room
-	CMP #6
-     BNE .skipL061
-.condpart59
-	LDA #145
-	CMP player0x
-     BCS .skip59then
-.condpart60
- jsr .room7
-	LDA #22
-	STA player0x
-.skip59then
-.skipL061
-.L062 ;  if room  =  7  &&  player0x  <  5 then gosub room6  :  player0x  =  140
-
-	LDA room
-	CMP #7
-     BNE .skipL062
-.condpart61
-	LDA player0x
-	CMP #5
-     BCS .skip61then
-.condpart62
- jsr .room6
-	LDA #140
-	STA player0x
 .skip61then
-.skipL062
+.skipL057
 .
  ; 
 
-.L063 ;  if room  =  7  &&  player0x  >  145 then gosub room9  :  player0x  =  22
+.L058 ;  if room  =  1  &&  player0x  >  145 then gosub room2  :  player0x  =  22
 
 	LDA room
-	CMP #7
-     BNE .skipL063
+	CMP #1
+     BNE .skipL058
 .condpart63
 	LDA #145
 	CMP player0x
      BCS .skip63then
 .condpart64
- jsr .room9
+ jsr .room2
 	LDA #22
 	STA player0x
 .skip63then
-.skipL063
-.L064 ;  if room  =  9  &&  player0x  <  5 then gosub room7  :  player0x  =  140
+.skipL058
+.L059 ;  if room  =  2  &&  player0x  <  5 then gosub room1  :  player0x  =  140
 
 	LDA room
-	CMP #9
-     BNE .skipL064
+	CMP #2
+     BNE .skipL059
 .condpart65
 	LDA player0x
 	CMP #5
      BCS .skip65then
 .condpart66
- jsr .room7
+ jsr .room1
 	LDA #140
 	STA player0x
 .skip65then
-.skipL064
+.skipL059
 .
  ; 
 
-.L065 ;  if room  =  8  &&  player0y  <  5 then gosub room7  :  player0y  =  80
+.L060 ;  if room  =  1  &&  player0y  <  10 then gosub room3  :  player0y  =  80
 
 	LDA room
-	CMP #8
-     BNE .skipL065
+	CMP #1
+     BNE .skipL060
 .condpart67
 	LDA player0y
-	CMP #5
+	CMP #10
      BCS .skip67then
 .condpart68
- jsr .room7
+ jsr .room3
 	LDA #80
 	STA player0y
 .skip67then
-.skipL065
-.L066 ;  if room  =  7  &&  player0y  >  85 then gosub room8  :  player0y  =  10
+.skipL060
+.L061 ;  if room  =  3  &&  player0y  >  85 then gosub room1  :  player0y  =  10
 
 	LDA room
-	CMP #7
-     BNE .skipL066
+	CMP #3
+     BNE .skipL061
 .condpart69
 	LDA #85
 	CMP player0y
      BCS .skip69then
 .condpart70
- jsr .room8
+ jsr .room1
 	LDA #10
 	STA player0y
 .skip69then
-.skipL066
+.skipL061
 .
  ; 
 
-.L067 ;  drawscreen
+.L062 ;  if room  =  3  &&  player0x  >  145 then gosub room4  :  player0x  =  22
+
+	LDA room
+	CMP #3
+     BNE .skipL062
+.condpart71
+	LDA #145
+	CMP player0x
+     BCS .skip71then
+.condpart72
+ jsr .room4
+	LDA #22
+	STA player0x
+.skip71then
+.skipL062
+.L063 ;  if room  =  4  &&  player0x  <  5 then gosub room3  :  player0x  =  140
+
+	LDA room
+	CMP #4
+     BNE .skipL063
+.condpart73
+	LDA player0x
+	CMP #5
+     BCS .skip73then
+.condpart74
+ jsr .room3
+	LDA #140
+	STA player0x
+.skip73then
+.skipL063
+.
+ ; 
+
+.L064 ;  if room  =  2  &&  player0y  <  5 then gosub room4  :  player0y  =  80
+
+	LDA room
+	CMP #2
+     BNE .skipL064
+.condpart75
+	LDA player0y
+	CMP #5
+     BCS .skip75then
+.condpart76
+ jsr .room4
+	LDA #80
+	STA player0y
+.skip75then
+.skipL064
+.L065 ;  if room  =  4  &&  player0y  >  85 then gosub room2  :  player0y  =  10
+
+	LDA room
+	CMP #4
+     BNE .skipL065
+.condpart77
+	LDA #85
+	CMP player0y
+     BCS .skip77then
+.condpart78
+ jsr .room2
+	LDA #10
+	STA player0y
+.skip77then
+.skipL065
+.
+ ; 
+
+.L066 ;  if room  =  3  &&  player0y  <  10 then gosub room5  :  player0y  =  80
+
+	LDA room
+	CMP #3
+     BNE .skipL066
+.condpart79
+	LDA player0y
+	CMP #10
+     BCS .skip79then
+.condpart80
+ jsr .room5
+	LDA #80
+	STA player0y
+.skip79then
+.skipL066
+.L067 ;  if room  =  5  &&  player0y  >  85 then gosub room3  :  player0y  =  10
+
+	LDA room
+	CMP #5
+     BNE .skipL067
+.condpart81
+	LDA #85
+	CMP player0y
+     BCS .skip81then
+.condpart82
+ jsr .room3
+	LDA #10
+	STA player0y
+.skip81then
+.skipL067
+.
+ ; 
+
+.L068 ;  if room  =  4  &&  player0x  >  145 then gosub room6  :  player0x  =  22
+
+	LDA room
+	CMP #4
+     BNE .skipL068
+.condpart83
+	LDA #145
+	CMP player0x
+     BCS .skip83then
+.condpart84
+ jsr .room6
+	LDA #22
+	STA player0x
+.skip83then
+.skipL068
+.L069 ;  if room  =  6  &&  player0x  <  5 then gosub room4  :  player0x  =  140
+
+	LDA room
+	CMP #6
+     BNE .skipL069
+.condpart85
+	LDA player0x
+	CMP #5
+     BCS .skip85then
+.condpart86
+ jsr .room4
+	LDA #140
+	STA player0x
+.skip85then
+.skipL069
+.
+ ; 
+
+.L070 ;  if room  =  6  &&  player0x  >  145 then gosub room7  :  player0x  =  22
+
+	LDA room
+	CMP #6
+     BNE .skipL070
+.condpart87
+	LDA #145
+	CMP player0x
+     BCS .skip87then
+.condpart88
+ jsr .room7
+	LDA #22
+	STA player0x
+.skip87then
+.skipL070
+.L071 ;  if room  =  7  &&  player0x  <  5 then gosub room6  :  player0x  =  140
+
+	LDA room
+	CMP #7
+     BNE .skipL071
+.condpart89
+	LDA player0x
+	CMP #5
+     BCS .skip89then
+.condpart90
+ jsr .room6
+	LDA #140
+	STA player0x
+.skip89then
+.skipL071
+.
+ ; 
+
+.L072 ;  if room  =  7  &&  player0x  >  145 then gosub room9  :  player0x  =  22
+
+	LDA room
+	CMP #7
+     BNE .skipL072
+.condpart91
+	LDA #145
+	CMP player0x
+     BCS .skip91then
+.condpart92
+ jsr .room9
+	LDA #22
+	STA player0x
+.skip91then
+.skipL072
+.L073 ;  if room  =  9  &&  player0x  <  5 then gosub room7  :  player0x  =  140
+
+	LDA room
+	CMP #9
+     BNE .skipL073
+.condpart93
+	LDA player0x
+	CMP #5
+     BCS .skip93then
+.condpart94
+ jsr .room7
+	LDA #140
+	STA player0x
+.skip93then
+.skipL073
+.
+ ; 
+
+.L074 ;  if room  =  8  &&  player0y  <  5 then gosub room7  :  player0y  =  80
+
+	LDA room
+	CMP #8
+     BNE .skipL074
+.condpart95
+	LDA player0y
+	CMP #5
+     BCS .skip95then
+.condpart96
+ jsr .room7
+	LDA #80
+	STA player0y
+.skip95then
+.skipL074
+.L075 ;  if room  =  7  &&  player0y  >  85 then gosub room8  :  player0y  =  10
+
+	LDA room
+	CMP #7
+     BNE .skipL075
+.condpart97
+	LDA #85
+	CMP player0y
+     BCS .skip97then
+.condpart98
+ jsr .room8
+	LDA #10
+	STA player0y
+.skip97then
+.skipL075
+.
+ ; 
+
+.L076 ;  drawscreen
 
  jsr drawscreen
-.L068 ;  goto mainloop
+.L077 ;  goto mainloop
 
  jmp .mainloop
 
@@ -2255,12 +2431,12 @@ game
 .moverizquierda
  ; moverizquierda
 
-.L069 ;  player0:
+.L078 ;  player0:
 
-	LDA #<playerL069_0
+	LDA #<playerL078_0
 
 	STA player0pointerlo
-	LDA #>playerL069_0
+	LDA #>playerL078_0
 
 	STA player0pointerhi
 	LDA #9
@@ -2268,11 +2444,11 @@ game
 .
  ; 
 
-.L070 ;  if collision(playfield,player0) then player0x  =  player0x  +  1  :  noright  =  0  :  noleft  =  1  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
+.L079 ;  if collision(playfield,player0) then player0x  =  player0x  +  1  :  noright  =  0  :  noleft  =  1  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL070
-.condpart71
+	BPL .skipL079
+.condpart99
 	INC player0x
 	LDA #0
 	STA noright
@@ -2282,7 +2458,7 @@ game
 	STA noup
 	STA nodown
  jmp .skipelse0
-.skipL070
+.skipL079
 	DEC player0x
 	LDA #0
 	STA noright
@@ -2290,25 +2466,25 @@ game
 	STA noup
 	STA nodown
 .skipelse0
-.L071 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
+.L080 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
 
 	LDA haslance
 	CMP #1
-     BNE .skipL071
-.condpart72
+     BNE .skipL080
+.condpart100
 	LDA player0x
 	STA missile0x
 	LDA player0y
 	SEC
 	SBC #2
 	STA missile0y
-.skipL071
-.L072 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
+.skipL080
+.L081 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
 
 	LDA hasshield
 	CMP #1
-     BNE .skipL072
-.condpart73
+     BNE .skipL081
+.condpart101
 	LDA player0x
 	CLC
 	ADC #7
@@ -2317,8 +2493,8 @@ game
 	SEC
 	SBC #3
 	STA bally
-.skipL072
-.L073 ;  return
+.skipL081
+.L082 ;  return
 
 	RTS
 .
@@ -2327,12 +2503,12 @@ game
 .moverderecha
  ; moverderecha
 
-.L074 ;  player0:
+.L083 ;  player0:
 
-	LDA #<playerL074_0
+	LDA #<playerL083_0
 
 	STA player0pointerlo
-	LDA #>playerL074_0
+	LDA #>playerL083_0
 
 	STA player0pointerhi
 	LDA #9
@@ -2340,11 +2516,11 @@ game
 .
  ; 
 
-.L075 ;  if collision(playfield,player0) then player0x  =  player0x  -  1  :  noright  =  1  :  noleft  =  0  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
+.L084 ;  if collision(playfield,player0) then player0x  =  player0x  -  1  :  noright  =  1  :  noleft  =  0  :  noup  =  0  :  nodown  =  0 else player0x  =  player0x  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL075
-.condpart74
+	BPL .skipL084
+.condpart102
 	DEC player0x
 	LDA #1
 	STA noright
@@ -2353,7 +2529,7 @@ game
 	STA noup
 	STA nodown
  jmp .skipelse1
-.skipL075
+.skipL084
 	INC player0x
 	LDA #0
 	STA noright
@@ -2361,12 +2537,12 @@ game
 	STA noup
 	STA nodown
 .skipelse1
-.L076 ;  if haslance  =  1 then missile0x  =  player0x  +  9  :  missile0y  =  player0y  -  2
+.L085 ;  if haslance  =  1 then missile0x  =  player0x  +  9  :  missile0y  =  player0y  -  2
 
 	LDA haslance
 	CMP #1
-     BNE .skipL076
-.condpart75
+     BNE .skipL085
+.condpart103
 	LDA player0x
 	CLC
 	ADC #9
@@ -2375,13 +2551,13 @@ game
 	SEC
 	SBC #2
 	STA missile0y
-.skipL076
-.L077 ;  if hasshield  =  1 then ballx  =  player0x  -  1  :  bally  =  player0y  -  3
+.skipL085
+.L086 ;  if hasshield  =  1 then ballx  =  player0x  -  1  :  bally  =  player0y  -  3
 
 	LDA hasshield
 	CMP #1
-     BNE .skipL077
-.condpart76
+     BNE .skipL086
+.condpart104
 	LDA player0x
 	SEC
 	SBC #1
@@ -2390,8 +2566,8 @@ game
 	SEC
 	SBC #3
 	STA bally
-.skipL077
-.L078 ;  return
+.skipL086
+.L087 ;  return
 
 	RTS
 .
@@ -2400,12 +2576,12 @@ game
 .moverarriba
  ; moverarriba
 
-.L079 ;  player0:
+.L088 ;  player0:
 
-	LDA #<playerL079_0
+	LDA #<playerL088_0
 
 	STA player0pointerlo
-	LDA #>playerL079_0
+	LDA #>playerL088_0
 
 	STA player0pointerhi
 	LDA #9
@@ -2413,11 +2589,11 @@ game
 .
  ; 
 
-.L080 ;  if collision(playfield,player0) then player0y  =  player0y  +  1  :  noright  =  0  :  noleft  =  0  :  noup  =  1  :  nodown  =  0 else player0y  =  player0y  -  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
+.L089 ;  if collision(playfield,player0) then player0y  =  player0y  +  1  :  noright  =  0  :  noleft  =  0  :  noup  =  1  :  nodown  =  0 else player0y  =  player0y  -  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL080
-.condpart77
+	BPL .skipL089
+.condpart105
 	INC player0y
 	LDA #0
 	STA noright
@@ -2427,7 +2603,7 @@ game
 	LDA #0
 	STA nodown
  jmp .skipelse2
-.skipL080
+.skipL089
 	DEC player0y
 	LDA #0
 	STA noright
@@ -2435,25 +2611,25 @@ game
 	STA noup
 	STA nodown
 .skipelse2
-.L081 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
+.L090 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
 
 	LDA haslance
 	CMP #1
-     BNE .skipL081
-.condpart78
+     BNE .skipL090
+.condpart106
 	LDA player0x
 	STA missile0x
 	LDA player0y
 	SEC
 	SBC #2
 	STA missile0y
-.skipL081
-.L082 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
+.skipL090
+.L091 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
 
 	LDA hasshield
 	CMP #1
-     BNE .skipL082
-.condpart79
+     BNE .skipL091
+.condpart107
 	LDA player0x
 	CLC
 	ADC #7
@@ -2462,8 +2638,8 @@ game
 	SEC
 	SBC #3
 	STA bally
-.skipL082
-.L083 ;  return
+.skipL091
+.L092 ;  return
 
 	RTS
 .
@@ -2472,12 +2648,12 @@ game
 .moverabajo
  ; moverabajo
 
-.L084 ;  player0:
+.L093 ;  player0:
 
-	LDA #<playerL084_0
+	LDA #<playerL093_0
 
 	STA player0pointerlo
-	LDA #>playerL084_0
+	LDA #>playerL093_0
 
 	STA player0pointerhi
 	LDA #9
@@ -2485,11 +2661,11 @@ game
 .
  ; 
 
-.L085 ;  if collision(playfield,player0) then player0y  =  player0y  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  1 else player0y  =  player0y  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
+.L094 ;  if collision(playfield,player0) then player0y  =  player0y  -  1  :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  1 else player0y  =  player0y  +  1 :  noright  =  0  :  noleft  =  0  :  noup  =  0  :  nodown  =  0
 
 	BIT CXP0FB
-	BPL .skipL085
-.condpart80
+	BPL .skipL094
+.condpart108
 	DEC player0y
 	LDA #0
 	STA noright
@@ -2498,7 +2674,7 @@ game
 	LDA #1
 	STA nodown
  jmp .skipelse3
-.skipL085
+.skipL094
 	INC player0y
 	LDA #0
 	STA noright
@@ -2506,25 +2682,25 @@ game
 	STA noup
 	STA nodown
 .skipelse3
-.L086 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
+.L095 ;  if haslance  =  1 then missile0x  =  player0x  :  missile0y  =  player0y  -  2
 
 	LDA haslance
 	CMP #1
-     BNE .skipL086
-.condpart81
+     BNE .skipL095
+.condpart109
 	LDA player0x
 	STA missile0x
 	LDA player0y
 	SEC
 	SBC #2
 	STA missile0y
-.skipL086
-.L087 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
+.skipL095
+.L096 ;  if hasshield  =  1 then ballx  =  player0x  +  7  :  bally  =  player0y  -  3
 
 	LDA hasshield
 	CMP #1
-     BNE .skipL087
-.condpart82
+     BNE .skipL096
+.condpart110
 	LDA player0x
 	CLC
 	ADC #7
@@ -2533,8 +2709,8 @@ game
 	SEC
 	SBC #3
 	STA bally
-.skipL087
-.L088 ;  return
+.skipL096
+.L097 ;  return
 
 	RTS
 .
@@ -2543,121 +2719,236 @@ game
 .colocarmoneda
  ; colocarmoneda
 
-.L089 ;  if hascoin  =  1 then player1x  =  0  :  player1y  =  0
+.L098 ;  if hascoin  =  1 then player1x  =  0  :  player1y  =  0
 
 	LDA hascoin
 	CMP #1
-     BNE .skipL089
-.condpart83
+     BNE .skipL098
+.condpart111
 	LDA #0
 	STA player1x
 	STA player1y
-.skipL089
-.L090 ;  randnumber  =  rand
+.skipL098
+.
+ ; 
+
+.L099 ;  randnumber  =  rand
 
  jsr randomize
 	STA randnumber
-.L091 ;  if hascoin  =  0  &&  randnumber  <=  51 then player1x  =  30  :  player1y  =  20
+.L0100 ;  if hascoin  =  0  &&  randnumber  <=  153 then coinvalue  =  1
 
 	LDA hascoin
 	CMP #0
-     BNE .skipL091
-.condpart84
-	LDA #51
-	CMP randnumber
-     BCC .skip84then
-.condpart85
-	LDA #30
-	STA player1x
-	LDA #20
-	STA player1y
-.skip84then
-.skipL091
-.L092 ;  if hascoin  =  0  &&  randnumber  >  51  &&  randnumber  <=  102 then player1x  =  120  :  player1y  =  20
-
-	LDA hascoin
-	CMP #0
-     BNE .skipL092
-.condpart86
-	LDA #51
-	CMP randnumber
-     BCS .skip86then
-.condpart87
-	LDA #102
-	CMP randnumber
-     BCC .skip87then
-.condpart88
-	LDA #120
-	STA player1x
-	LDA #20
-	STA player1y
-.skip87then
-.skip86then
-.skipL092
-.L093 ;  if hascoin  =  0  &&  randnumber  >  102  &&  randnumber  <=  153 then player1x  =  30  :  player1y  =  75
-
-	LDA hascoin
-	CMP #0
-     BNE .skipL093
-.condpart89
-	LDA #102
-	CMP randnumber
-     BCS .skip89then
-.condpart90
+     BNE .skipL0100
+.condpart112
 	LDA #153
 	CMP randnumber
-     BCC .skip90then
-.condpart91
-	LDA #30
-	STA player1x
-	LDA #75
-	STA player1y
-.skip90then
-.skip89then
-.skipL093
-.L094 ;  if hascoin  =  0  &&  randnumber  >  153  &&  randnumber  <=  204 then player1x  =  120  :  player1y  =  75
+     BCC .skip112then
+.condpart113
+	LDA #1
+	STA coinvalue
+.skip112then
+.skipL0100
+.L0101 ;  if hascoin  =  0  &&  randnumber  >  153  &&  randnumber  <=  204 then coinvalue  =  5
 
 	LDA hascoin
 	CMP #0
-     BNE .skipL094
-.condpart92
+     BNE .skipL0101
+.condpart114
 	LDA #153
 	CMP randnumber
-     BCS .skip92then
-.condpart93
+     BCS .skip114then
+.condpart115
 	LDA #204
 	CMP randnumber
-     BCC .skip93then
-.condpart94
-	LDA #120
-	STA player1x
-	LDA #75
-	STA player1y
-.skip93then
-.skip92then
-.skipL094
-.L095 ;  if hascoin  =  0  &&  randnumber  >  204  &&  randnumber  <=  255 then player1x  =  77  :  player1y  =  45
+     BCC .skip115then
+.condpart116
+	LDA #5
+	STA coinvalue
+.skip115then
+.skip114then
+.skipL0101
+.L0102 ;  if hascoin  =  0  &&  randnumber  >  204  &&  randnumber  <=  255 then coinvalue  =  32
 
 	LDA hascoin
 	CMP #0
-     BNE .skipL095
-.condpart95
+     BNE .skipL0102
+.condpart117
 	LDA #204
 	CMP randnumber
-     BCS .skip95then
-.condpart96
+     BCS .skip117then
+.condpart118
 	LDA #255
 	CMP randnumber
-     BCC .skip96then
-.condpart97
+     BCC .skip118then
+.condpart119
+	LDA #32
+	STA coinvalue
+.skip118then
+.skip117then
+.skipL0102
+.
+ ; 
+
+.L0103 ;  randnumber  =  rand
+
+ jsr randomize
+	STA randnumber
+.L0104 ;  if hascoin  =  0  &&  randnumber  <=  51 then player1x  =  30  :  player1y  =  20
+
+	LDA hascoin
+	CMP #0
+     BNE .skipL0104
+.condpart120
+	LDA #51
+	CMP randnumber
+     BCC .skip120then
+.condpart121
+	LDA #30
+	STA player1x
+	LDA #20
+	STA player1y
+.skip120then
+.skipL0104
+.L0105 ;  if hascoin  =  0  &&  randnumber  >  51  &&  randnumber  <=  102 then player1x  =  120  :  player1y  =  20
+
+	LDA hascoin
+	CMP #0
+     BNE .skipL0105
+.condpart122
+	LDA #51
+	CMP randnumber
+     BCS .skip122then
+.condpart123
+	LDA #102
+	CMP randnumber
+     BCC .skip123then
+.condpart124
+	LDA #120
+	STA player1x
+	LDA #20
+	STA player1y
+.skip123then
+.skip122then
+.skipL0105
+.L0106 ;  if hascoin  =  0  &&  randnumber  >  102  &&  randnumber  <=  153 then player1x  =  30  :  player1y  =  75
+
+	LDA hascoin
+	CMP #0
+     BNE .skipL0106
+.condpart125
+	LDA #102
+	CMP randnumber
+     BCS .skip125then
+.condpart126
+	LDA #153
+	CMP randnumber
+     BCC .skip126then
+.condpart127
+	LDA #30
+	STA player1x
+	LDA #75
+	STA player1y
+.skip126then
+.skip125then
+.skipL0106
+.L0107 ;  if hascoin  =  0  &&  randnumber  >  153  &&  randnumber  <=  204 then player1x  =  120  :  player1y  =  75
+
+	LDA hascoin
+	CMP #0
+     BNE .skipL0107
+.condpart128
+	LDA #153
+	CMP randnumber
+     BCS .skip128then
+.condpart129
+	LDA #204
+	CMP randnumber
+     BCC .skip129then
+.condpart130
+	LDA #120
+	STA player1x
+	LDA #75
+	STA player1y
+.skip129then
+.skip128then
+.skipL0107
+.L0108 ;  if hascoin  =  0  &&  randnumber  >  204  &&  randnumber  <=  255 then player1x  =  77  :  player1y  =  45
+
+	LDA hascoin
+	CMP #0
+     BNE .skipL0108
+.condpart131
+	LDA #204
+	CMP randnumber
+     BCS .skip131then
+.condpart132
+	LDA #255
+	CMP randnumber
+     BCC .skip132then
+.condpart133
 	LDA #77
 	STA player1x
 	LDA #45
 	STA player1y
-.skip96then
-.skip95then
-.skipL095
-.L096 ;  return
+.skip132then
+.skip131then
+.skipL0108
+.L0109 ;  return
+
+	RTS
+.
+ ; 
+
+.moverlanza
+ ; moverlanza
+
+.L0110 ;  if compass  =  1 then missile0y  =  missile0y  -  2
+
+	LDA compass
+	CMP #1
+     BNE .skipL0110
+.condpart134
+	LDA missile0y
+	SEC
+	SBC #2
+	STA missile0y
+.skipL0110
+.L0111 ;  if compass  =  2 then missile0x  =  missile0x  +  2
+
+	LDA compass
+	CMP #2
+     BNE .skipL0111
+.condpart135
+	LDA missile0x
+	CLC
+	ADC #2
+	STA missile0x
+.skipL0111
+.L0112 ;  if compass  =  3 then missile0y  =  missile0y  +  2
+
+	LDA compass
+	CMP #3
+     BNE .skipL0112
+.condpart136
+	LDA missile0y
+	CLC
+	ADC #2
+	STA missile0y
+.skipL0112
+.L0113 ;  if compass  =  4 then missile0x  =  missile0x  -  2
+
+	LDA compass
+	CMP #4
+     BNE .skipL0113
+.condpart137
+	LDA missile0x
+	SEC
+	SBC #2
+	STA missile0x
+.skipL0113
+.L0114 ;  return
 
 	RTS
 .
@@ -2666,23 +2957,23 @@ game
 .room1
  ; room1
 
-.L097 ;  room  =  1
+.L0115 ;  room  =  1
 
 	LDA #1
 	STA room
-.L098 ;  hascoin  =  0
+.L0116 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L099 ;  pfclear
+.L0117 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0100 ;  COLUPF  =  $C0
+.L0118 ;  COLUPF  =  $C0
 
 	LDA #$C0
 	STA COLUPF
-.L0101 ;  playfield:
+.L0119 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -2707,24 +2998,24 @@ pflabel0
 	sta playfield,x
 	dex
 	bpl pflabel0
-.L0102 ;  if haslance  =  1 then gosub colocarmoneda else hascoin  =  1  :  gosub colocarmoneda
+.L0120 ;  if haslance  =  1 then gosub colocarmoneda else hascoin  =  1  :  gosub colocarmoneda
 
 	LDA haslance
 	CMP #1
-     BNE .skipL0102
-.condpart98
+     BNE .skipL0120
+.condpart138
  jsr .colocarmoneda
  jmp .skipelse4
-.skipL0102
+.skipL0120
 	LDA #1
 	STA hascoin
  jsr .colocarmoneda
 
 .skipelse4
-.L0103 ;  drawscreen
+.L0121 ;  drawscreen
 
  jsr drawscreen
-.L0104 ;  return
+.L0122 ;  return
 
 	RTS
 .
@@ -2733,23 +3024,23 @@ pflabel0
 .room2
  ; room2
 
-.L0105 ;  room  =  2
+.L0123 ;  room  =  2
 
 	LDA #2
 	STA room
-.L0106 ;  hascoin  =  0
+.L0124 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0107 ;  pfclear
+.L0125 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0108 ;  COLUPF  =  $C0
+.L0126 ;  COLUPF  =  $C0
 
 	LDA #$C0
 	STA COLUPF
-.L0109 ;  playfield:
+.L0127 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -2774,24 +3065,24 @@ pflabel1
 	sta playfield,x
 	dex
 	bpl pflabel1
-.L0110 ;  if hasshield  =  1 then gosub colocarmoneda else hascoin  =  1  :  gosub colocarmoneda
+.L0128 ;  if hasshield  =  1 then gosub colocarmoneda else hascoin  =  1  :  gosub colocarmoneda
 
 	LDA hasshield
 	CMP #1
-     BNE .skipL0110
-.condpart99
+     BNE .skipL0128
+.condpart139
  jsr .colocarmoneda
  jmp .skipelse5
-.skipL0110
+.skipL0128
 	LDA #1
 	STA hascoin
  jsr .colocarmoneda
 
 .skipelse5
-.L0111 ;  drawscreen
+.L0129 ;  drawscreen
 
  jsr drawscreen
-.L0112 ;  return
+.L0130 ;  return
 
 	RTS
 .
@@ -2800,23 +3091,23 @@ pflabel1
 .room3
  ; room3
 
-.L0113 ;  room  =  3
+.L0131 ;  room  =  3
 
 	LDA #3
 	STA room
-.L0114 ;  hascoin  =  0
+.L0132 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0115 ;  pfclear
+.L0133 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0116 ;  COLUPF  =  $C0
+.L0134 ;  COLUPF  =  $C0
 
 	LDA #$C0
 	STA COLUPF
-.L0117 ;  playfield:
+.L0135 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -2841,14 +3132,14 @@ pflabel2
 	sta playfield,x
 	dex
 	bpl pflabel2
-.L0118 ;  gosub colocarmoneda
+.L0136 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0119 ;  drawscreen
+.L0137 ;  drawscreen
 
  jsr drawscreen
-.L0120 ;  return
+.L0138 ;  return
 
 	RTS
 .
@@ -2857,23 +3148,23 @@ pflabel2
 .room4
  ; room4
 
-.L0121 ;  room  =  4
+.L0139 ;  room  =  4
 
 	LDA #4
 	STA room
-.L0122 ;  hascoin  =  0
+.L0140 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0123 ;  pfclear
+.L0141 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0124 ;  COLUPF  =  $C0
+.L0142 ;  COLUPF  =  $C0
 
 	LDA #$C0
 	STA COLUPF
-.L0125 ;  playfield:
+.L0143 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -2898,14 +3189,14 @@ pflabel3
 	sta playfield,x
 	dex
 	bpl pflabel3
-.L0126 ;  gosub colocarmoneda
+.L0144 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0127 ;  drawscreen
+.L0145 ;  drawscreen
 
  jsr drawscreen
-.L0128 ;  return
+.L0146 ;  return
 
 	RTS
 .
@@ -2914,23 +3205,23 @@ pflabel3
 .room5
  ; room5
 
-.L0129 ;  room  =  5
+.L0147 ;  room  =  5
 
 	LDA #5
 	STA room
-.L0130 ;  hascoin  =  0
+.L0148 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0131 ;  pfclear
+.L0149 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0132 ;  COLUPF  =  $40
+.L0150 ;  COLUPF  =  $40
 
 	LDA #$40
 	STA COLUPF
-.L0133 ;  playfield:
+.L0151 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -2955,14 +3246,14 @@ pflabel4
 	sta playfield,x
 	dex
 	bpl pflabel4
-.L0134 ;  gosub colocarmoneda
+.L0152 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0135 ;  drawscreen
+.L0153 ;  drawscreen
 
  jsr drawscreen
-.L0136 ;  return
+.L0154 ;  return
 
 	RTS
 .
@@ -2971,23 +3262,23 @@ pflabel4
 .room6
  ; room6
 
-.L0137 ;  room  =  6
+.L0155 ;  room  =  6
 
 	LDA #6
 	STA room
-.L0138 ;  hascoin  =  1
+.L0156 ;  hascoin  =  1
 
 	LDA #1
 	STA hascoin
-.L0139 ;  pfclear
+.L0157 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0140 ;  COLUPF  =  $A0
+.L0158 ;  COLUPF  =  $A0
 
 	LDA #$A0
 	STA COLUPF
-.L0141 ;  playfield:
+.L0159 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -3012,14 +3303,14 @@ pflabel5
 	sta playfield,x
 	dex
 	bpl pflabel5
-.L0142 ;  gosub colocarmoneda
+.L0160 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0143 ;  drawscreen
+.L0161 ;  drawscreen
 
  jsr drawscreen
-.L0144 ;  return
+.L0162 ;  return
 
 	RTS
 .
@@ -3028,23 +3319,23 @@ pflabel5
 .room7
  ; room7
 
-.L0145 ;  room  =  7
+.L0163 ;  room  =  7
 
 	LDA #7
 	STA room
-.L0146 ;  hascoin  =  1
+.L0164 ;  hascoin  =  1
 
 	LDA #1
 	STA hascoin
-.L0147 ;  pfclear
+.L0165 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0148 ;  COLUPF  =  $A0
+.L0166 ;  COLUPF  =  $A0
 
 	LDA #$A0
 	STA COLUPF
-.L0149 ;  playfield:
+.L0167 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -3057,26 +3348,26 @@ PF_data6
 	.byte %00000000, %00000000, %00001111, %11111111
 	.byte %00000000, %00000000, %00001111, %11111111
 	.byte %00000000, %00000000, %00001111, %11111111
-	.byte %11111111, %00011111, %00000000, %00000000
-	.byte %11111111, %00011111, %00000000, %00000000
-	.byte %11111111, %00011111, %00000000, %00000000
+	.byte %11111111, %00011111, %00000000, %10000000
+	.byte %11111111, %00011111, %00000000, %10000000
+	.byte %11111111, %00011111, %00000000, %10000000
 	.byte %11111111, %00011111, %00001111, %11111111
-	.byte %11111111, %00011111, %00001111, %11111111
-	.byte %11111111, %00011111, %00001111, %11111111
-	.byte %11111111, %00011111, %00001111, %11111111
+	.byte %11111111, %00011111, %00001000, %00000000
+	.byte %11111111, %00011111, %00001000, %00000000
+	.byte %11111111, %00011111, %00001000, %10000000
 pflabel6
 	lda PF_data6,x
 	sta playfield,x
 	dex
 	bpl pflabel6
-.L0150 ;  gosub colocarmoneda
+.L0168 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0151 ;  drawscreen
+.L0169 ;  drawscreen
 
  jsr drawscreen
-.L0152 ;  return
+.L0170 ;  return
 
 	RTS
 .
@@ -3085,23 +3376,23 @@ pflabel6
 .room8
  ; room8
 
-.L0153 ;  room  =  8
+.L0171 ;  room  =  8
 
 	LDA #8
 	STA room
-.L0154 ;  hascoin  =  0
+.L0172 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0155 ;  pfclear
+.L0173 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0156 ;  COLUPF  =  $A0
+.L0174 ;  COLUPF  =  $A0
 
 	LDA #$A0
 	STA COLUPF
-.L0157 ;  playfield:
+.L0175 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -3110,14 +3401,14 @@ pflabel6
   endif
 	jmp pflabel7
 PF_data7
-	.byte %11111111, %00011111, %00001111, %11111111
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %11111111, %00011111, %00001100, %10000000
+	.byte %10000000, %00000000, %00001100, %10000000
+	.byte %10000000, %00000000, %00001100, %10000000
+	.byte %10000000, %00000000, %00001100, %10000000
+	.byte %10000000, %00000000, %00001100, %10000000
+	.byte %10000000, %00000000, %00001100, %10000000
+	.byte %10000000, %11111111, %11111100, %10000000
+	.byte %10000000, %11111111, %11111100, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %11111111, %11111111, %11111111, %11111111
@@ -3126,14 +3417,14 @@ pflabel7
 	sta playfield,x
 	dex
 	bpl pflabel7
-.L0158 ;  gosub colocarmoneda
+.L0176 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0159 ;  drawscreen
+.L0177 ;  drawscreen
 
  jsr drawscreen
-.L0160 ;  return
+.L0178 ;  return
 
 	RTS
 .
@@ -3142,23 +3433,23 @@ pflabel7
 .room9
  ; room9
 
-.L0161 ;  room  =  9
+.L0179 ;  room  =  9
 
 	LDA #9
 	STA room
-.L0162 ;  hascoin  =  0
+.L0180 ;  hascoin  =  0
 
 	LDA #0
 	STA hascoin
-.L0163 ;  pfclear
+.L0181 ;  pfclear
 
 	LDA #0
  jsr pfclear
-.L0164 ;  COLUPF  =  $A0
+.L0182 ;  COLUPF  =  $A0
 
 	LDA #$A0
 	STA COLUPF
-.L0165 ;  playfield:
+.L0183 ;  playfield:
 
   ifconst pfres
     ldx #4*pfres-1
@@ -3171,51 +3462,34 @@ PF_data8
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %10000000, %00000000, %00000000, %10000000
 	.byte %10000000, %11100000, %11110000, %10000000
-	.byte %00000000, %00100000, %00010000, %10000000
-	.byte %00000000, %00100000, %00010000, %10000000
-	.byte %00000000, %00100000, %00010000, %10000000
+	.byte %10000000, %00100000, %00010000, %10000000
+	.byte %10000000, %00100000, %00010000, %10000000
+	.byte %10000000, %00100000, %00010000, %10000000
 	.byte %10000000, %11100000, %11110000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
-	.byte %10000000, %00000000, %00000000, %10000000
+	.byte %00000000, %00000000, %00000000, %10000000
+	.byte %00000000, %00000000, %00000000, %10000000
 	.byte %11111111, %11111111, %11111111, %11111111
 pflabel8
 	lda PF_data8,x
 	sta playfield,x
 	dex
 	bpl pflabel8
-.L0166 ;  gosub colocarmoneda
+.L0184 ;  gosub colocarmoneda
 
  jsr .colocarmoneda
 
-.L0167 ;  drawscreen
+.L0185 ;  drawscreen
 
  jsr drawscreen
-.L0168 ;  return
+.L0186 ;  return
 
 	RTS
- if (<*) > (<(*+10))
-	repeat ($100-<*)
-	.byte 0
-	repend
-	endif
-playerL00_0
-
-	.byte 0
-	.byte  %01101100
-	.byte  %00100100
-	.byte  %00100100
-	.byte  %00011000
-	.byte  %11111111
-	.byte  %10011001
-	.byte  %00100100
-	.byte  %00111100
-	.byte  %00110110
  if (<*) > (<(*+5))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playerL01_1
+playerL00_1
 
 	.byte 0
 	.byte  %0110
@@ -3227,7 +3501,7 @@ playerL01_1
 	.byte 0
 	repend
 	endif
-playerL069_0
+playerL078_0
 
 	.byte 0
 	.byte  %01101100
@@ -3244,7 +3518,7 @@ playerL069_0
 	.byte 0
 	repend
 	endif
-playerL074_0
+playerL083_0
 
 	.byte 0
 	.byte  %00110110
@@ -3261,7 +3535,7 @@ playerL074_0
 	.byte 0
 	repend
 	endif
-playerL079_0
+playerL088_0
 
 	.byte 0
 	.byte  %01100110
@@ -3278,7 +3552,7 @@ playerL079_0
 	.byte 0
 	repend
 	endif
-playerL084_0
+playerL093_0
 
 	.byte 0
 	.byte  %01100110

@@ -1,15 +1,3 @@
- player0:
- %01101100
- %00100100
- %00100100
- %00011000
- %11111111
- %10011001
- %00100100
- %00111100
- %00110110
-end
-
  player1:
  %0110
  %1111
@@ -30,10 +18,13 @@ end
  dim hasshield = g
  dim hascoin = h
  dim randnumber = i
+ dim coinvalue = j
+ dim compass = k
 
  haslance = 0
  hasshield = 0
  hascoin = 0
+ coinvalue = 1
 
  room = 0
  nodown = 0
@@ -58,11 +49,13 @@ end
 
 mainloop
 
- if room = 0 then gosub room1 
+ if room = 0 then gosub room1 : gosub moverderecha 
  const screenheight=84
 
  COLUP0 = $86
- COLUP1 = $1C 
+ COLUP1 = $4A 
+ if coinvalue = 5 then COLUP1 = $0A 
+ if coinvalue = 32 then COLUP1 = $1E 
 
  AUDV0 = 0
 
@@ -71,9 +64,16 @@ mainloop
  if !joy0left && !joy0right && joy0up && !joy0down && noup = 0 then gosub moverarriba
  if !joy0left && !joy0right && !joy0up && joy0down && nodown = 0 then gosub moverabajo
 
+ if joy0fire && joy0left && !joy0right && !joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 4
+ if joy0fire && !joy0left && joy0right && !joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 2
+ if joy0fire && !joy0left && !joy0right && joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 1
+ if joy0fire && !joy0left && !joy0right && !joy0up && joy0down && haslance = 1 then haslance = 2 : compass = 3
+
+ if haslance = 2 && !collision(playfield,player1) then gosub moverlanza
+
  if collision(missile0,player0) && haslance = 0 then haslance = 1 
  if collision(ball,player0) && hasshield = 0 then hasshield = 1 
- if collision(player1,player0) && hascoin = 0 then hascoin = 1 : score = score + 10 : gosub colocarmoneda 
+ if collision(player1,player0) && hascoin = 0 then hascoin = 1 : score = score + coinvalue : gosub colocarmoneda 
 
  if room = 1 && haslance = 0 then missile0x = 83 : missile0y = 48
  if room <> 1 && haslance = 0 then missile0x = 0 : missile0y = 0
@@ -177,7 +177,7 @@ moverabajo
  %00111100
  %00100100
 end
- 
+
  if collision(playfield,player0) then player0y = player0y - 1 : noright = 0 : noleft = 0 : noup = 0 : nodown = 1 else player0y = player0y + 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
  if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
  if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
@@ -185,12 +185,25 @@ end
 
 colocarmoneda
  if hascoin = 1 then player1x = 0 : player1y = 0
+
+ randnumber = rand
+ if hascoin = 0 && randnumber <= 153 then coinvalue = 1 
+ if hascoin = 0 && randnumber > 153 && randnumber <= 204 then coinvalue = 5 
+ if hascoin = 0 && randnumber > 204 && randnumber <= 255 then coinvalue = 32
+
  randnumber = rand
  if hascoin = 0 && randnumber <= 51 then player1x = 30 : player1y = 20
  if hascoin = 0 && randnumber > 51 && randnumber <= 102 then  player1x = 120 : player1y = 20
  if hascoin = 0 && randnumber > 102 && randnumber <= 153 then player1x = 30 : player1y = 75
  if hascoin = 0 && randnumber > 153 && randnumber <= 204 then player1x = 120 : player1y = 75
  if hascoin = 0 && randnumber > 204 && randnumber <= 255 then player1x = 77 : player1y = 45
+ return
+
+moverlanza
+ if compass = 1 then missile0y = missile0y - 2
+ if compass = 2 then missile0x = missile0x + 2
+ if compass = 3 then missile0y = missile0y + 2
+ if compass = 4 then missile0x = missile0x - 2
  return
 
 room1
@@ -335,13 +348,13 @@ room7
  ....................XXXXXXXXXXXX
  ....................XXXXXXXXXXXX
  ....................XXXXXXXXXXXX
- XXXXXXXXXXXXX...................
- XXXXXXXXXXXXX...................
- XXXXXXXXXXXXX...................
+ XXXXXXXXXXXXX..................X
+ XXXXXXXXXXXXX..................X
+ XXXXXXXXXXXXX..................X
  XXXXXXXXXXXXX.......XXXXXXXXXXXX
- XXXXXXXXXXXXX.......XXXXXXXXXXXX
- XXXXXXXXXXXXX.......XXXXXXXXXXXX
- XXXXXXXXXXXXX.......XXXXXXXXXXXX 
+ XXXXXXXXXXXXX.......X...........
+ XXXXXXXXXXXXX.......X...........
+ XXXXXXXXXXXXX.......X..........X 
 end
  gosub colocarmoneda
  drawscreen
@@ -353,14 +366,14 @@ room8
  pfclear
  COLUPF = $A0
  playfield:
- XXXXXXXXXXXXX.......XXXXXXXXXXXX
- X..............................X
- X..............................X
- X..............................X
- X..............................X
- X..............................X
- X..............................X
- X..............................X
+ XXXXXXXXXXXXX.......XX.........X
+ X...................XX.........X
+ X...................XX.........X
+ X...................XX.........X
+ X...................XX.........X
+ X...................XX.........X
+ X.......XXXXXXXXXXXXXX.........X
+ X.......XXXXXXXXXXXXXX.........X
  X..............................X
  X..............................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
@@ -379,12 +392,12 @@ room9
  X..............................X
  X..............................X
  X............XXXXXXX...........X
- .............X.....X...........X
- .............X.....X...........X
- .............X.....X...........X
+ X............X.....X...........X
+ X............X.....X...........X
+ X............X.....X...........X
  X............XXXXXXX...........X
- X..............................X
- X..............................X
+ ...............................X
+ ...............................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  gosub colocarmoneda
