@@ -22,14 +22,19 @@ end
  %00100100
  %00111100
  %00110110
-
 end
 
- COLUPF = 176
+ player1:
+ %0110
+ %1111
+ %1111
+ %0110
+end
+
+ COLUBK = 2
+ COLUPF = 240
  scorecolor = 52
  score = 0
-
-
 
  dim nodown = a
  dim noup = b
@@ -38,9 +43,11 @@ end
  dim room = e
  dim haslance = f
  dim hasshield = g
+ dim hascoin = h
 
  haslance = 0
  hasshield = 0
+ hascoin = 0
 
  room = 1
  nodown = 0
@@ -48,17 +55,20 @@ end
  noleft = 0
  noright = 0
 
-
  player0x = 21
  player0y = 80
 
- missile0height = 6
- missile0x = 80
+ missile0height = 8
+ missile0x = 83
  missile0y = 45
 
- missile1height = 4
- missile1x = 0
- missile1y = 0
+ player1x = 120
+ player1y = 20
+
+ ballheight = 4
+ CTRLPF = $21
+ ballx = 0
+ bally = 0
 
 mainloop
  const screenheight=84
@@ -72,7 +82,8 @@ mainloop
  if !joy0left && !joy0right && !joy0up && joy0down && nodown = 0 then gosub moverabajo
 
  if collision(missile0,player0) && haslance = 0 then haslance = 1 
- if collision(missile1,player0) && hasshield = 0 then hasshield = 1 
+ if collision(ball,player0) && hasshield = 0 then hasshield = 1 
+ if collision(player1,player0) && hascoin = 0 then hascoin = 1 : score = score + 10 
 
  if room = 1 && player0x > 145 then gosub room2	: player0x = 22
  if room = 2 && player0x < 5 then gosub room1 : player0x = 140	
@@ -86,8 +97,20 @@ mainloop
  if room = 2 && player0y < 5 then gosub room4 : player0y = 80	
  if room = 4 && player0y > 85 then gosub room2 : player0y = 10	
 
- if room = 2 && hasshield = 0 then missile1x = 80 : missile1y = 45
- if room <> 2 && hasshield = 0 then missile1x = 0 : missile1y = 0
+ if room = 1 && haslance = 0 then missile0x = 83 : missile0y = 45
+ if room <> 1 && haslance = 0 then missile0x = 0 : missile0y = 0
+
+ if room = 2 && hasshield = 0 then ballx = 83 : bally = 45
+ if room <> 2 && hasshield = 0 then ballx = 0 : bally = 0
+
+ if room = 3 && player0y < 10 then gosub room5 : player0y = 80	
+ if room = 5 && player0y > 85 then gosub room3 : player0y = 10	
+
+ if room = 4 && player0x > 145 then gosub room6	: player0x = 22
+ if room = 6 && player0x < 5 then gosub room4 : player0x = 140	
+
+ if room = 6 && player0x > 145 then gosub room7	: player0x = 22
+ if room = 7 && player0x < 5 then gosub room6 : player0x = 140	
 
  drawscreen
  goto mainloop
@@ -106,8 +129,8 @@ moverizquierda
 end
  
  if collision(playfield,player0) then player0x = player0x + 1 : noright = 0 : noleft = 1 : noup = 0 : nodown = 0 else player0x = player0x - 1 : noright = 0 : noleft = 0 : noup = 0 : nodown = 0
- if haslance = 1 then missile0x = player0x : missile0y = player0y - 4
- if hasshield = 1 then missile1x = player0x + 9 : missile1y = player0y - 2
+ if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
+ if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
  return
 
 moverderecha
@@ -124,8 +147,8 @@ moverderecha
 end
  
  if collision(playfield,player0) then player0x = player0x - 1 : noright = 1 : noleft = 0 : noup = 0 : nodown = 0 else player0x = player0x + 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
- if haslance = 1 then missile0x = player0x + 9 : missile0y = player0y - 4
- if hasshield = 1 then missile1x = player0x : missile1y = player0y - 2
+ if haslance = 1 then missile0x = player0x + 9 : missile0y = player0y - 2
+ if hasshield = 1 then ballx = player0x - 1  : bally = player0y - 3
  return
 
 moverarriba
@@ -142,8 +165,8 @@ moverarriba
 end
 
  if collision(playfield,player0) then player0y = player0y + 1 : noright = 0 : noleft = 0 : noup = 1 : nodown = 0 else player0y = player0y - 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
- if haslance = 1 then missile0x = player0x : missile0y = player0y - 4
- if hasshield = 1 then missile1x = player0x + 9 : missile1y = player0y - 2
+ if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
+ if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
  return
 
 moverabajo
@@ -160,13 +183,16 @@ moverabajo
 end
  
  if collision(playfield,player0) then player0y = player0y - 1 : noright = 0 : noleft = 0 : noup = 0 : nodown = 1 else player0y = player0y + 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
- if haslance = 1 then missile0x = player0x : missile0y = player0y - 4
- if hasshield = 1 then missile1x = player0x + 9 : missile1y = player0y - 2
+ if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
+ if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
  return
 
 room1
  room = 1
+ hascoin = 0
  pfclear
+ COLUBK = 2
+ COLUPF = 240
  playfield:
  XXXXXXXXXXXX........XXXXXXXXXXXX
  X..............................X
@@ -185,7 +211,10 @@ end
 
 room2
  room = 2
+ hascoin = 0
  pfclear
+ COLUBK = 2
+ COLUPF = 240
  playfield:
  XXXXXXXXXXXX........XXXXXXXXXXXX
  X..............................X
@@ -204,9 +233,12 @@ end
 
 room3
  room = 3
+ hascoin = 0
  pfclear
+ COLUBK = 2
+ COLUPF = 240
  playfield:
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXX.......XXXXXXXXXXXX
  X..............................X
  X..............................X
  X............XXXXXXX...........X
@@ -223,19 +255,88 @@ end
 
 room4
  room = 4
+ hascoin = 0
  pfclear
+ COLUBK = 2
+ COLUPF = 240
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
  X..............................X
  X..............................X
  X............X.....X...........X
- .............X.....X...........X
- .............X.....X...........X
- .............X.....X...........X
+ .............X.....X............
+ .............X.....X............
+ .............X.....X............
  X............X.....X...........X
  X..............................X
  X..............................X
  XXXXXXXXXXXX........XXXXXXXXXXXX 
+end
+ drawscreen
+ return
+
+room5
+ room = 5
+ hascoin = 0
+ pfclear
+ COLUBK = 2
+ COLUPF = 64
+ playfield:
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ XXXXXXXXXXXX........XXXXXXXXXXXX 
+end
+ drawscreen
+ return
+
+room6
+ room = 6
+ hascoin = 0
+ pfclear
+ COLUBK = 2
+ COLUPF = 112
+ playfield:
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXXXXXXXXXXXXX........
+ XXXXXXXXXXXXXXXXXXXXXXXX........
+ XXXXXXXXXXXXXXXXXXXXXXXX........
+ .........XXXXXXXXXXXXXXX.......X
+ .........XXXXXXXXXXXXXXX.......X
+ .........XXXXXXXXXXXXXXX.......X
+ X..............................X
+ X..............................X
+ X..............................X
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+end
+ drawscreen
+ return
+
+room7
+ room = 7
+ hascoin = 0
+ pfclear
+ COLUBK = 2
+ COLUPF = 112
+ playfield:
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ ...............................X
+ ...............................X
+ ...............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ X..............................X
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 end
  drawscreen
  return
