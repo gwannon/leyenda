@@ -112,6 +112,12 @@ mainloop
  if room = 6 && player0x > 145 then gosub room7	: player0x = 22
  if room = 7 && player0x < 5 then gosub room6 : player0x = 140	
 
+ if room = 7 && player0x > 145 then gosub room9	: player0x = 22
+ if room = 9 && player0x < 5 then gosub room7 : player0x = 140	
+ 
+ if room = 8 && player0y < 5 then gosub room7 : player0y = 80	
+ if room = 7 && player0y > 85 then gosub room8 : player0y = 10
+
  drawscreen
  goto mainloop
 
@@ -327,9 +333,31 @@ room7
  COLUPF = 112
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- ...............................X
- ...............................X
- ...............................X
+ ....................XXXXXXXXXXXX
+ ....................XXXXXXXXXXXX
+ ....................XXXXXXXXXXXX
+ XXXXXXXXXXXX....................
+ XXXXXXXXXXXX....................
+ XXXXXXXXXXXX....................
+ XXXXXXXXXXXX........XXXXXXXXXXXX
+ XXXXXXXXXXXX........XXXXXXXXXXXX
+ XXXXXXXXXXXX........XXXXXXXXXXXX
+ XXXXXXXXXXXX........XXXXXXXXXXXX 
+end
+ drawscreen
+ return
+
+room8
+ room = 8
+ hascoin = 0
+ pfclear
+ COLUBK = 2
+ COLUPF = 112
+ playfield:
+ XXXXXXXXXXXX........XXXXXXXXXXXX
+ X..............................X
+ X..............................X
+ X..............................X
  X..............................X
  X..............................X
  X..............................X
@@ -337,6 +365,28 @@ room7
  X..............................X
  X..............................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+end
+ drawscreen
+ return
+
+room9
+ room = 9
+ hascoin = 0
+ pfclear
+ COLUBK = 2
+ COLUPF = 112
+ playfield:
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ X..............................X
+ X..............................X
+ X............XXXXXXX...........X
+ .............XXXXXXX...........X
+ .............XXXXXXX...........X
+ .............XXXXXXX...........X
+ X............XXXXXXX...........X
+ X..............................X
+ X..............................X
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  drawscreen
  return
