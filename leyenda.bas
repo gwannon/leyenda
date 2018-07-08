@@ -35,6 +35,7 @@ end
  player0x = 21
  player0y = 80
 
+
  missile0height = 8
  missile0x = 83
  missile0y = 48
@@ -63,15 +64,19 @@ mainloop
  if !joy0left && joy0right && !joy0up && !joy0down && noright = 0 then gosub moverderecha
  if !joy0left && !joy0right && joy0up && !joy0down && noup = 0 then gosub moverarriba
  if !joy0left && !joy0right && !joy0up && joy0down && nodown = 0 then gosub moverabajo
+ if joy0fire && haslance = 1 then haslance = 2
 
- if joy0fire && joy0left && !joy0right && !joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 4
- if joy0fire && !joy0left && joy0right && !joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 2
- if joy0fire && !joy0left && !joy0right && joy0up && !joy0down && haslance = 1 then haslance = 2 : compass = 1
- if joy0fire && !joy0left && !joy0right && !joy0up && joy0down && haslance = 1 then haslance = 2 : compass = 3
+ if haslance = 2 && !collision(playfield,missile0) then gosub moverlanza
+ if haslance = 2 && collision(playfield,missile0) && compass = 2 then haslance = 3 : missile0x = missile0x - 0  
+ if haslance = 2 && collision(playfield,missile0) then haslance = 3  
 
- if haslance = 2 && !collision(playfield,player1) then gosub moverlanza
+ if compass = 1 && haslance = 3 then NUSIZ0 = $00 : missile0height = 8
+ if compass = 2 && haslance = 3 then NUSIZ0 = $30 : missile0height = 0
+ if compass = 3 && haslance = 3 then NUSIZ0 = $00 : missile0height = 8
+ if compass = 4 && haslance = 3 then NUSIZ0 = $30 : missile0height = 0
 
- if collision(missile0,player0) && haslance = 0 then haslance = 1 
+ if collision(missile0,player0) && haslance = 0 then haslance = 1 : NUSIZ0 = $00 : missile0height = 8 
+ if collision(missile0,player0) && haslance = 3 then haslance = 1 : NUSIZ0 = $00 : missile0height = 8 
  if collision(ball,player0) && hasshield = 0 then hasshield = 1 
  if collision(player1,player0) && hascoin = 0 then hascoin = 1 : score = score + coinvalue : gosub colocarmoneda 
 
@@ -123,7 +128,8 @@ moverizquierda
  %00111100
  %00110110
 end
- 
+
+ if haslance = 1 then compass = 4 
  if collision(playfield,player0) then player0x = player0x + 1 : noright = 0 : noleft = 1 : noup = 0 : nodown = 0 else player0x = player0x - 1 : noright = 0 : noleft = 0 : noup = 0 : nodown = 0
  if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
  if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
@@ -142,6 +148,7 @@ moverderecha
  %01101100
 end
  
+ if haslance = 1 then compass = 2
  if collision(playfield,player0) then player0x = player0x - 1 : noright = 1 : noleft = 0 : noup = 0 : nodown = 0 else player0x = player0x + 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
  if haslance = 1 then missile0x = player0x + 9 : missile0y = player0y - 2
  if hasshield = 1 then ballx = player0x - 1  : bally = player0y - 3
@@ -160,6 +167,7 @@ moverarriba
  %00100100
 end
 
+ if haslance = 1 then compass = 1
  if collision(playfield,player0) then player0y = player0y + 1 : noright = 0 : noleft = 0 : noup = 1 : nodown = 0 else player0y = player0y - 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
  if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
  if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
@@ -178,6 +186,7 @@ moverabajo
  %00100100
 end
 
+ if haslance = 1 then compass = 3
  if collision(playfield,player0) then player0y = player0y - 1 : noright = 0 : noleft = 0 : noup = 0 : nodown = 1 else player0y = player0y + 1: noright = 0 : noleft = 0 : noup = 0 : nodown = 0
  if haslance = 1 then missile0x = player0x : missile0y = player0y - 2
  if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
@@ -200,10 +209,10 @@ colocarmoneda
  return
 
 moverlanza
- if compass = 1 then missile0y = missile0y - 2
- if compass = 2 then missile0x = missile0x + 2
- if compass = 3 then missile0y = missile0y + 2
- if compass = 4 then missile0x = missile0x - 2
+ if compass = 1 then NUSIZ0 = $00 : missile0height = 8 : missile0y = missile0y - 2
+ if compass = 2 then NUSIZ0 = $30 : missile0height = 0 : missile0x = missile0x + 2
+ if compass = 3 then NUSIZ0 = $00 : missile0height = 8 : missile0y = missile0y + 2
+ if compass = 4 then NUSIZ0 = $30 : missile0height = 0 : missile0x = missile0x - 2
  return
 
 room1
@@ -225,6 +234,7 @@ room1
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  if haslance = 1 then gosub colocarmoneda else hascoin = 1 : gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -247,6 +257,7 @@ room2
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  if hasshield = 1 then gosub colocarmoneda else hascoin = 1 : gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -269,6 +280,7 @@ room3
  XXXXXXXXXXXXX.......XXXXXXXXXXXX
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -291,6 +303,7 @@ room4
  XXXXXXXXXXXXX.......XXXXXXXXXXXX 
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -313,6 +326,7 @@ room5
  X......XXXXXXXXX.......XXXXXXXXX 
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -335,6 +349,7 @@ room6
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -357,6 +372,7 @@ room7
  XXXXXXXXXXXXX.......X..........X 
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -379,6 +395,7 @@ room8
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
 
@@ -401,5 +418,6 @@ room9
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  gosub colocarmoneda
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
  drawscreen
  return
