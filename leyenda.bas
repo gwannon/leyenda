@@ -1,9 +1,18 @@
  player1:
- %0110
- %1111
- %1111
- %0110
+ %01101100
+ %01101100
+ %00100100
+ %00100100
+ %00011000
+ %00011000
+ %11011011
+ %11111111
+ %00011000
+ %00100100
+ %01111110
+ %01000010
 end
+
  score = 0
 
  COLUBK = $04
@@ -20,11 +29,13 @@ end
  dim randnumber = i
  dim coinvalue = j
  dim compass = k
+ dim dead = l
 
  haslance = 0
  hasshield = 0
  hascoin = 0
  coinvalue = 1
+ dead = 0
 
  room = 0
  nodown = 0
@@ -32,16 +43,19 @@ end
  noleft = 0
  noright = 0
 
- player0x = 21
- player0y = 80
+ player0x = 24
+ player0y = 76
 
+ player1x = 118
+ player1y = 28
 
  missile0height = 8
  missile0x = 83
  missile0y = 48
 
- player1x = 120
- player1y = 20
+ missile1height = 1
+ missile1x = 120
+ missile1y = 20	
 
  ballheight = 4
  CTRLPF = $21
@@ -53,6 +67,8 @@ mainloop
  if room = 0 then gosub room1 : gosub moverderecha 
  const screenheight=84
 
+ NUSIZ1 = $10
+
  COLUP0 = $86
  COLUP1 = $4A 
  if coinvalue = 5 then COLUP1 = $0A 
@@ -60,15 +76,21 @@ mainloop
 
  AUDV0 = 0
 
+ if collision(player1,player0) && hasshield = 1 then gosub boing : hasshield = 0 : ballx = 0 : bally = 0  
+ if collision(player1,player0) && hasshield = 0 then drawscreen : goto mainloop
+
  if joy0left && !joy0right && !joy0up && !joy0down && noleft = 0 then gosub moverizquierda
  if !joy0left && joy0right && !joy0up && !joy0down && noright = 0 then gosub moverderecha
  if !joy0left && !joy0right && joy0up && !joy0down && noup = 0 then gosub moverarriba
  if !joy0left && !joy0right && !joy0up && joy0down && nodown = 0 then gosub moverabajo
  if joy0fire && haslance = 1 then haslance = 2
 
+ gosub moverenemigo
+
  if haslance = 2 && !collision(playfield,missile0) then gosub moverlanza
  if haslance = 2 && collision(playfield,missile0) && compass = 2 then haslance = 3 : missile0x = missile0x - 0  
- if haslance = 2 && collision(playfield,missile0) then haslance = 3  
+ if haslance = 2 && collision(playfield,missile0) then haslance = 3 
+ if haslance = 2 && collision(player1,missile0) then haslance = 3 
 
  if compass = 1 && haslance = 3 then NUSIZ0 = $00 : missile0height = 8
  if compass = 2 && haslance = 3 then NUSIZ0 = $30 : missile0height = 0
@@ -77,8 +99,8 @@ mainloop
 
  if collision(missile0,player0) && haslance = 0 then haslance = 1 : NUSIZ0 = $00 : missile0height = 8 
  if collision(missile0,player0) && haslance = 3 then haslance = 1 : NUSIZ0 = $00 : missile0height = 8 
- if collision(ball,player0) && hasshield = 0 then hasshield = 1 
- if collision(player1,player0) && hascoin = 0 then hascoin = 1 : score = score + coinvalue : gosub colocarmoneda 
+ if collision(ball,player0) && hasshield = 0 then hasshield = 1
+ if collision(missile1,player0) && hascoin = 0 then hascoin = 1 : score = score + coinvalue : gosub colocarmoneda 
 
  if room = 1 && haslance = 0 then missile0x = 83 : missile0y = 48
  if room <> 1 && haslance = 0 then missile0x = 0 : missile0y = 0
@@ -192,8 +214,15 @@ end
  if hasshield = 1 then ballx = player0x + 7 : bally = player0y - 3
  return
 
+boing
+ if compass = 1 then player0x = player0y - 20 
+ if compass = 2 then player0x = player0x - 20 
+ if compass = 3 then player0x = player0y + 20 
+ if compass = 4 then player0x = player0x + 20 
+ return
+
 colocarmoneda
- if hascoin = 1 then player1x = 0 : player1y = 0
+ if hascoin = 1 then missile1x = 0 : missile1y = 0 : player1x = 0 : player1y = 0
 
  randnumber = rand
  if hascoin = 0 && randnumber <= 153 then coinvalue = 1 
@@ -201,11 +230,11 @@ colocarmoneda
  if hascoin = 0 && randnumber > 204 && randnumber <= 255 then coinvalue = 32
 
  randnumber = rand
- if hascoin = 0 && randnumber <= 51 then player1x = 30 : player1y = 20
- if hascoin = 0 && randnumber > 51 && randnumber <= 102 then  player1x = 120 : player1y = 20
- if hascoin = 0 && randnumber > 102 && randnumber <= 153 then player1x = 30 : player1y = 75
- if hascoin = 0 && randnumber > 153 && randnumber <= 204 then player1x = 120 : player1y = 75
- if hascoin = 0 && randnumber > 204 && randnumber <= 255 then player1x = 77 : player1y = 45
+ if hascoin = 0 && randnumber <= 51 then player1x = 28 : player1y = 22
+ if hascoin = 0 && randnumber > 51 && randnumber <= 102 then player1x = 118 : player1y = 22
+ if hascoin = 0 && randnumber > 102 && randnumber <= 153 then player1x = 28 : player1y = 77
+ if hascoin = 0 && randnumber > 153 && randnumber <= 204 then player1x = 118 : player1y = 77
+ if hascoin = 0 && randnumber > 204 && randnumber <= 255 then player1x = 85 : player1y = 50
  return
 
 moverlanza
@@ -215,10 +244,18 @@ moverlanza
  if compass = 4 then NUSIZ0 = $30 : missile0height = 0 : missile0x = missile0x - 2
  return
 
+moverenemigo
+ if player1y = 22 && player1x < 118 then player1x = player1x + 1 
+ if player1y = 77 && player1x > 28 then player1x = player1x - 1
+ if player1x = 118 && player1y < 77 then player1y = player1y + 1
+ if player1x = 28 && player1y > 22 then player1y = player1y - 1
+ missile1x = player1x + 4
+ missile1y = player1y - 4
+ return
+
 room1
  room = 1
  hascoin = 0
- pfclear
  COLUPF = $C0
  playfield:
  XXXXXXXXXXXXX.......XXXXXXXXXXXX
@@ -235,13 +272,12 @@ room1
 end
  if haslance = 1 then gosub colocarmoneda else hascoin = 1 : gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
+
  return
 
 room2
  room = 2
  hascoin = 0
- pfclear
  COLUPF = $C0
  playfield:
  XXXXXXXXXXXXX.......XXXXXXXXXXXX
@@ -258,13 +294,11 @@ room2
 end
  if hasshield = 1 then gosub colocarmoneda else hascoin = 1 : gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room3
  room = 3
  hascoin = 0
- pfclear
  COLUPF = $C0
  playfield:
  X......XXXXXXXXX.......XXXXXXXXX  
@@ -281,13 +315,11 @@ room3
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room4
  room = 4
  hascoin = 0
- pfclear
  COLUPF = $C0
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -304,13 +336,11 @@ room4
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room5
  room = 5
  hascoin = 0
- pfclear
  COLUPF = $40
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -327,13 +357,11 @@ room5
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room6
  room = 6
  hascoin = 1
- pfclear
  COLUPF = $A0
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -350,13 +378,11 @@ room6
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room7
  room = 7
  hascoin = 1
- pfclear
  COLUPF = $A0
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -373,13 +399,11 @@ room7
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room8
  room = 8
  hascoin = 0
- pfclear
  COLUPF = $A0
  playfield:
  XXXXXXXXXXXXX.......XX.........X
@@ -389,20 +413,18 @@ room8
  X...................XX.........X
  X...................XX.........X
  X.......XXXXXXXXXXXXXX.........X
- X.......XXXXXXXXXXXXXX.........X
+ X..............................X
  X..............................X
  X..............................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
 
 room9
  room = 9
  hascoin = 0
- pfclear
  COLUPF = $A0
  playfield:
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -419,5 +441,4 @@ room9
 end
  gosub colocarmoneda
  if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8 
- drawscreen
  return
