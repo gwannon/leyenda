@@ -1,6 +1,6 @@
  score = 0
 
- COLUBK = $04
+ COLUBK = $F4
 
  dim nodown = a
  dim noup = b
@@ -73,9 +73,8 @@ mainloop
  if haslance = 2 && collision(playfield,missile0) then haslance = 3 
  if haslance = 2 && collision(player1,missile0) then haslance = 3 : minotauro = minotauro - 1 
 
- if minotauro > 0 then gosub moverenemigo
+ if minotauro > 0 then gosub moverenemigo else  gosub minomuerto
  if minotauro = 1 then gosub minoheridauno
- if minotauro = 0 then gosub minomuerto
 
  if compass = 1 && haslance = 3 then NUSIZ0 = $00 : missile0height = 8
  if compass = 2 && haslance = 3 then NUSIZ0 = $30 : missile0height = 0
@@ -259,7 +258,6 @@ minoheridauno
  %00011000
  %00100100
  %00111100
- %00000000
 end
  return
 
@@ -294,7 +292,7 @@ room1
  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 end
  if haslance = 1 then gosub colocarmoneda else hascoin = 1 : gosub colocarmoneda
- if haslance = 3 then haslance = 0 : missile0height = 8 
+ if haslance = 3 then haslance = 0 : NUSIZ0 = $00 : missile0height = 8
 
  return
 
